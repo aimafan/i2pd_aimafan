@@ -23,6 +23,7 @@
 #include "util.h"
 #include "Socks5.h"
 #include "NTCP2.h"
+#include "Logger.h"
 
 #if defined(__linux__) && !defined(_NETINET_IN_H)
 	#include <linux/in6.h>
@@ -463,6 +464,10 @@ namespace transport
 	void NTCP2Session::SendSessionRequest ()
 	{
 		m_Establisher->CreateSessionRequestMessage ();
+		std::string size = std::to_string(m_Establisher->m_SessionRequestBufferLen);
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
+		LogToFile("发 ; " + host + " ; " + port + " ; 500 ; " + size);
 		// send message
 		m_HandshakeInterval = i2p::util::GetMillisecondsSinceEpoch ();
 		boost::asio::async_write (m_Socket, boost::asio::buffer (m_Establisher->m_SessionRequestBuffer, m_Establisher->m_SessionRequestBufferLen), boost::asio::transfer_all (),
@@ -540,7 +545,11 @@ namespace transport
 
 	void NTCP2Session::SendSessionCreated ()
 	{
-		m_Establisher->CreateSessionCreatedMessage ();
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
+		m_Establisher->CreateSessionCreatedMessage();
+		std::string size = std::to_string(m_Establisher->m_SessionRequestBufferLen);
+		LogToFile("收 ; " + host + " ; " + port + " ; 500 ; " + size);
 		// send message
 		m_HandshakeInterval = i2p::util::GetMillisecondsSinceEpoch ();
 		boost::asio::async_write (m_Socket, boost::asio::buffer (m_Establisher->m_SessionCreatedBuffer, m_Establisher->m_SessionCreatedBufferLen), boost::asio::transfer_all (),
@@ -549,6 +558,8 @@ namespace transport
 
 	void NTCP2Session::HandleSessionCreatedReceived (const boost::system::error_code& ecode, std::size_t bytes_transferred)
 	{
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
 		if (ecode)
 		{
 			LogPrint (eLogWarning, "NTCP2: SessionCreated read error: ", ecode.message ());
@@ -576,6 +587,8 @@ namespace transport
 				}
 				else
 					SendSessionConfirmed ();
+				std::string size = std::to_string(bytes_transferred + paddingLen);
+				LogToFile("收 ; " + host + " ; " + port + " ; 501 ; " + size);
 			}
 			else
 			{
@@ -614,6 +627,10 @@ namespace transport
 
 	void NTCP2Session::HandleSessionConfirmedSent (const boost::system::error_code& ecode, std::size_t bytes_transferred)
 	{
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
+		std::string size = std::to_string(bytes_transferred);
+		LogToFile("发 ; " + host + " ; " + port + " ; 502 ; " + size);
 		(void) bytes_transferred;
 		if (ecode)
 		{
@@ -641,6 +658,10 @@ namespace transport
 
 	void NTCP2Session::HandleSessionCreatedSent (const boost::system::error_code& ecode, std::size_t bytes_transferred)
 	{
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
+		std::string size = std::to_string(bytes_transferred);
+		LogToFile("发 ; " + host + " ; " + port + " ; 501 ; " + size);
 		(void) bytes_transferred;
 		if (ecode)
 		{
@@ -658,6 +679,10 @@ namespace transport
 
 	void NTCP2Session::HandleSessionConfirmedReceived (const boost::system::error_code& ecode, std::size_t bytes_transferred)
 	{
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
+		std::string size = std::to_string(bytes_transferred);
+		LogToFile("收 ; " + host + " ; " + port + " ; 502 ; " + size);
 		if (ecode)
 		{
 			LogPrint (eLogWarning, "NTCP2: SessionConfirmed read error: ", ecode.message ());
@@ -901,7 +926,10 @@ namespace transport
 
 	void NTCP2Session::ProcessNextFrame (const uint8_t * frame, size_t len)
 	{
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
 		size_t offset = 0;
+		LogToFile("收 ; " + host + " ; " + port + " ; -1 ; " + std::to_string(len + 18));
 		while (offset < len)
 		{
 			uint8_t blk = frame[offset];
@@ -918,6 +946,7 @@ namespace transport
 			{
 				case eNTCP2BlkDateTime:
 				{
+					LogToFile("收 ; " + host + " ; " + port + " ; 700 ; " + std::to_string(size));
 					LogPrint (eLogDebug, "NTCP2: Datetime");
 					if (m_IsEstablished)
 					{
@@ -932,16 +961,21 @@ namespace transport
 					break;
 				}
 				case eNTCP2BlkOptions:
+				{
+					LogToFile("收 ; " + host + " ; " + port + " ; 800 ; " + std::to_string(size));
 					LogPrint (eLogDebug, "NTCP2: Options");
+				}
 				break;
 				case eNTCP2BlkRouterInfo:
 				{
+					LogToFile("收 ; " + host + " ; " + port + " ; 600 ; " + std::to_string(size));
 					LogPrint (eLogDebug, "NTCP2: RouterInfo flag=", (int)frame[offset]);
 					i2p::data::netdb.PostI2NPMsg (CreateI2NPMessage (eI2NPDummyMsg, frame + offset, size));
 					break;
 				}
 				case eNTCP2BlkI2NPMessage:
 				{
+					LogToFile("收 ; " + host + " ; " + port + " ; " + std::to_string(frame[offset]) + " ; " + std::to_string(size));
 					LogPrint (eLogDebug, "NTCP2: I2NP");
 					if (size > I2NP_MAX_MESSAGE_SIZE)
 					{
@@ -961,6 +995,8 @@ namespace transport
 					break;
 				}
 				case eNTCP2BlkTermination:
+				{
+					LogToFile("收 ; " + host + " ; " + port + " ; 999 ; " + std::to_string(size));
 					if (size >= 9)
 					{
 						LogPrint (eLogDebug, "NTCP2: Termination. reason=", (int)(frame[offset + 8]));
@@ -968,9 +1004,13 @@ namespace transport
 					}
 					else
 						LogPrint (eLogWarning, "NTCP2: Unexpected termination block size ", size);
+				}
 				break;
 				case eNTCP2BlkPadding:
+				{
+					LogToFile("收 ; " + host + " ; " + port + " ; 900 ; " + std::to_string(size));
 					LogPrint (eLogDebug, "NTCP2: Padding");
+				}
 				break;
 				default:
 					LogPrint (eLogWarning, "NTCP2: Unknown block type ", (int)blk);
@@ -998,7 +1038,8 @@ namespace transport
 	void NTCP2Session::SendI2NPMsgs (std::vector<std::shared_ptr<I2NPMessage> >& msgs)
 	{
 		if (msgs.empty () || IsTerminated ()) return;
-
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
 		size_t totalLen = 0;
 		std::vector<std::pair<uint8_t *, size_t> > encryptBufs;
 		std::vector<boost::asio::const_buffer> bufs;
@@ -1039,6 +1080,7 @@ namespace transport
 			}
 
 			bufs.push_back (boost::asio::buffer (buf, len));
+			LogToFile("发 ; " + host + " ; " + port + " ; " + std::to_string(it->GetTypeID()) + " ; " + std::to_string(len));
 		}
 
 		if (!macBuf) // last block was not enough for MAC
@@ -1217,6 +1259,9 @@ namespace transport
 		payloadLen += paddingSize;
 		// encrypt and send
 		EncryptAndSendNextBuffer (payloadLen);
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
+		LogToFile("发 ; " + host + " ; " + port + " ; 600 ; " + std::to_string(payloadLen + 18));
 	}
 
 	void NTCP2Session::SendTermination (NTCP2TerminationReason reason)
@@ -1238,6 +1283,9 @@ namespace transport
 		auto paddingSize = CreatePaddingBlock (12, m_NextSendBuffer + 14, 19);
 		// encrypt and send
 		EncryptAndSendNextBuffer (paddingSize + 12);
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
+		LogToFile("发 ; " + host + " ; " + port + " ; 999 ; " + std::to_string(paddingSize + 12 + 18));
 	}
 
 	void NTCP2Session::SendTerminationAndTerminate (NTCP2TerminationReason reason)
