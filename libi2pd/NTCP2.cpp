@@ -23,10 +23,34 @@
 #include "util.h"
 #include "Socks5.h"
 #include "NTCP2.h"
+#include "Logger.h"
 
 #if defined(__linux__) && !defined(_NETINET_IN_H)
 	#include <linux/in6.h>
 #endif
+
+// 将i2pd中i2NP的数字转换为对应的字符串
+std::string I2NPMessageTypeToString(int number) {
+    switch(number) {
+        case 0: return "eI2NPDummyMsg";
+        case 1: return "eI2NPDatabaseStore";
+        case 2: return "eI2NPDatabaseLookup";
+        case 3: return "eI2NPDatabaseSearchReply";
+        case 10: return "eI2NPDeliveryStatus";
+        case 11: return "eI2NPGarlic";
+        case 18: return "eI2NPTunnelData";
+        case 19: return "eI2NPTunnelGateway";
+        case 20: return "eI2NPData";
+        case 21: return "eI2NPTunnelBuild";
+        case 22: return "eI2NPTunnelBuildReply";
+        case 23: return "eI2NPVariableTunnelBuild";
+        case 24: return "eI2NPVariableTunnelBuildReply";
+        case 25: return "eI2NPShortTunnelBuild";
+        case 26: return "eI2NPShortTunnelBuildReply";
+        case 231: return "eI2NPTunnelTest";
+        default: return "Unknown";
+    }
+}
 
 namespace i2p
 {
@@ -463,6 +487,9 @@ namespace transport
 	void NTCP2Session::SendSessionRequest ()
 	{
 		m_Establisher->CreateSessionRequestMessage ();
+		std::string size = std::to_string(m_Establisher->m_SessionRequestBufferLen);
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
 		// send message
 		m_HandshakeInterval = i2p::util::GetMillisecondsSinceEpoch ();
 		boost::asio::async_write (m_Socket, boost::asio::buffer (m_Establisher->m_SessionRequestBuffer, m_Establisher->m_SessionRequestBufferLen), boost::asio::transfer_all (),
@@ -540,7 +567,10 @@ namespace transport
 
 	void NTCP2Session::SendSessionCreated ()
 	{
-		m_Establisher->CreateSessionCreatedMessage ();
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
+		m_Establisher->CreateSessionCreatedMessage();
+		std::string size = std::to_string(m_Establisher->m_SessionRequestBufferLen);
 		// send message
 		m_HandshakeInterval = i2p::util::GetMillisecondsSinceEpoch ();
 		boost::asio::async_write (m_Socket, boost::asio::buffer (m_Establisher->m_SessionCreatedBuffer, m_Establisher->m_SessionCreatedBufferLen), boost::asio::transfer_all (),
@@ -549,6 +579,8 @@ namespace transport
 
 	void NTCP2Session::HandleSessionCreatedReceived (const boost::system::error_code& ecode, std::size_t bytes_transferred)
 	{
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
 		if (ecode)
 		{
 			LogPrint (eLogWarning, "NTCP2: SessionCreated read error: ", ecode.message ());
@@ -576,6 +608,7 @@ namespace transport
 				}
 				else
 					SendSessionConfirmed ();
+				std::string size = std::to_string(bytes_transferred + paddingLen);
 			}
 			else
 			{
@@ -614,6 +647,9 @@ namespace transport
 
 	void NTCP2Session::HandleSessionConfirmedSent (const boost::system::error_code& ecode, std::size_t bytes_transferred)
 	{
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
+		std::string size = std::to_string(bytes_transferred);
 		(void) bytes_transferred;
 		if (ecode)
 		{
@@ -641,6 +677,9 @@ namespace transport
 
 	void NTCP2Session::HandleSessionCreatedSent (const boost::system::error_code& ecode, std::size_t bytes_transferred)
 	{
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
+		std::string size = std::to_string(bytes_transferred);
 		(void) bytes_transferred;
 		if (ecode)
 		{
@@ -658,6 +697,9 @@ namespace transport
 
 	void NTCP2Session::HandleSessionConfirmedReceived (const boost::system::error_code& ecode, std::size_t bytes_transferred)
 	{
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
+		std::string size = std::to_string(bytes_transferred);
 		if (ecode)
 		{
 			LogPrint (eLogWarning, "NTCP2: SessionConfirmed read error: ", ecode.message ());
@@ -901,6 +943,8 @@ namespace transport
 
 	void NTCP2Session::ProcessNextFrame (const uint8_t * frame, size_t len)
 	{
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
 		size_t offset = 0;
 		while (offset < len)
 		{
@@ -932,7 +976,9 @@ namespace transport
 					break;
 				}
 				case eNTCP2BlkOptions:
+				{
 					LogPrint (eLogDebug, "NTCP2: Options");
+				}
 				break;
 				case eNTCP2BlkRouterInfo:
 				{
@@ -961,6 +1007,7 @@ namespace transport
 					break;
 				}
 				case eNTCP2BlkTermination:
+				{
 					if (size >= 9)
 					{
 						LogPrint (eLogDebug, "NTCP2: Termination. reason=", (int)(frame[offset + 8]));
@@ -968,9 +1015,12 @@ namespace transport
 					}
 					else
 						LogPrint (eLogWarning, "NTCP2: Unexpected termination block size ", size);
+				}
 				break;
 				case eNTCP2BlkPadding:
+				{
 					LogPrint (eLogDebug, "NTCP2: Padding");
+				}
 				break;
 				default:
 					LogPrint (eLogWarning, "NTCP2: Unknown block type ", (int)blk);
@@ -998,7 +1048,8 @@ namespace transport
 	void NTCP2Session::SendI2NPMsgs (std::vector<std::shared_ptr<I2NPMessage> >& msgs)
 	{
 		if (msgs.empty () || IsTerminated ()) return;
-
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
 		size_t totalLen = 0;
 		std::vector<std::pair<uint8_t *, size_t> > encryptBufs;
 		std::vector<boost::asio::const_buffer> bufs;
@@ -1217,6 +1268,8 @@ namespace transport
 		payloadLen += paddingSize;
 		// encrypt and send
 		EncryptAndSendNextBuffer (payloadLen);
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
 	}
 
 	void NTCP2Session::SendTermination (NTCP2TerminationReason reason)
@@ -1238,6 +1291,8 @@ namespace transport
 		auto paddingSize = CreatePaddingBlock (12, m_NextSendBuffer + 14, 19);
 		// encrypt and send
 		EncryptAndSendNextBuffer (paddingSize + 12);
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
 	}
 
 	void NTCP2Session::SendTerminationAndTerminate (NTCP2TerminationReason reason)

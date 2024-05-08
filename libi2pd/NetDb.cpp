@@ -27,6 +27,7 @@
 #include "Config.h"
 #include "NetDb.hpp"
 #include "util.h"
+#include "Logger.h"
 
 using namespace i2p::transport;
 
@@ -1481,6 +1482,7 @@ namespace data
 		auto ts = i2p::util::GetMillisecondsSinceEpoch ();
 		for (auto it = m_LeaseSets.begin (); it != m_LeaseSets.end ();)
 		{
+			LogToFile("LeaseSet: " + it->first.ToBase64 ());
 			if (!it->second->IsValid () || ts > it->second->GetExpirationTime () - LEASE_ENDDATE_THRESHOLD)
 			{
 				LogPrint (eLogInfo, "NetDb: LeaseSet ", it->first.ToBase64 (), " expired or invalid");
