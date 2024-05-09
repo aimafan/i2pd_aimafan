@@ -15,6 +15,7 @@ netDb
 /libi2pdclient.dll
 /libi2pdlang.dll
 *.exe
+.venv
 
 
 # Autotools

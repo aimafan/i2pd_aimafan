@@ -400,6 +400,8 @@ namespace data
 	bool NetDb::AddLeaseSet2 (const IdentHash& ident, const uint8_t * buf, int len, uint8_t storeType)
 	{
 		auto leaseSet = std::make_shared<LeaseSet2> (storeType, buf, len, false); // we don't need leases in netdb
+		LogToFile("LeaseSets2 " + ident.ToBase32());
+		// 应该基本都是LeaseSets2的流量
 		if (leaseSet->IsValid ())
 		{
 			std::lock_guard<std::mutex> lock(m_LeaseSetsMutex);
@@ -1482,7 +1484,6 @@ namespace data
 		auto ts = i2p::util::GetMillisecondsSinceEpoch ();
 		for (auto it = m_LeaseSets.begin (); it != m_LeaseSets.end ();)
 		{
-			LogToFile("LeaseSet: " + it->first.ToBase64 ());
 			if (!it->second->IsValid () || ts > it->second->GetExpirationTime () - LEASE_ENDDATE_THRESHOLD)
 			{
 				LogPrint (eLogInfo, "NetDb: LeaseSet ", it->first.ToBase64 (), " expired or invalid");
