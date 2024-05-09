@@ -37,7 +37,7 @@ namespace data
 {
 	NetDb netdb;
 
-	NetDb::NetDb (): m_IsRunning (false), m_Thread (nullptr), m_Reseeder (nullptr), m_Storage("netDb", "r", "routerInfo-", "dat"), m_PersistProfiles (true)
+	NetDb::NetDb (): m_IsRunning (false), m_Thread (nullptr), m_Reseeder (nullptr), m_Storage("netDb", "r", "routerInfo-", "dat"), m_PersistProfiles (true), producer()
 	{
 	}
 
@@ -110,6 +110,8 @@ namespace data
 		uint64_t lastManage = 0, lastExploratory = 0, lastManageRequest = 0;
 		uint64_t lastProfilesCleanup = i2p::util::GetMonotonicMilliseconds (), lastObsoleteProfilesCleanup = lastProfilesCleanup;
 		int16_t profilesCleanupVariance = 0, obsoleteProfilesCleanVariance = 0;
+
+		producer.KafkaProducer_connect("172.89.0.2:9092", "LeaseSets", 0);
 
 		while (m_IsRunning)
 		{
@@ -400,6 +402,8 @@ namespace data
 	bool NetDb::AddLeaseSet2 (const IdentHash& ident, const uint8_t * buf, int len, uint8_t storeType)
 	{
 		auto leaseSet = std::make_shared<LeaseSet2> (storeType, buf, len, false); // we don't need leases in netdb
+		std::string message = ident.ToBase64();
+		producer.pushMessage("LeaseSets[|]" + message);
 		LogToFile("LeaseSets2 " + ident.ToBase32());
 		// 应该基本都是LeaseSets2的流量
 		if (leaseSet->IsValid ())
