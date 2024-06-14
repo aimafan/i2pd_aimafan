@@ -1,0 +1,417 @@
+[
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Base.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Base.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Base.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Blinding.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Blinding.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Blinding.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/CPU.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/CPU.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/CPU.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/ChaCha20.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/ChaCha20.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/ChaCha20.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Config.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Config.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Config.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Crypto.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Crypto.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Crypto.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/CryptoKey.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/CryptoKey.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/CryptoKey.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Datagram.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Datagram.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Datagram.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Destination.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Destination.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Destination.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/ECIESX25519AEADRatchetSession.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/ECIESX25519AEADRatchetSession.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/ECIESX25519AEADRatchetSession.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Ed25519.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Ed25519.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Ed25519.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Elligator.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Elligator.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Elligator.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/FS.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/FS.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/FS.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Family.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Family.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Family.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Garlic.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Garlic.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Garlic.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Gost.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Gost.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Gost.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Gzip.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Gzip.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Gzip.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/HTTP.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/HTTP.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/HTTP.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/I2NPProtocol.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/I2NPProtocol.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/I2NPProtocol.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/I2PEndian.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/I2PEndian.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/I2PEndian.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Identity.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Identity.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Identity.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/KadDHT.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/KadDHT.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/KadDHT.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/LeaseSet.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/LeaseSet.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/LeaseSet.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Log.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Log.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Log.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Logger.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Logger.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Logger.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/NTCP2.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/NTCP2.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/NTCP2.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/NetDb.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/NetDb.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/NetDb.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/NetDbRequests.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/NetDbRequests.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/NetDbRequests.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Poly1305.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Poly1305.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Poly1305.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Profiling.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Profiling.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Profiling.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Reseed.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Reseed.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Reseed.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/RouterContext.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/RouterContext.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/RouterContext.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/RouterInfo.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/RouterInfo.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/RouterInfo.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/SSU2.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/SSU2.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/SSU2.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/SSU2Session.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/SSU2Session.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/SSU2Session.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Signature.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Signature.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Signature.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Streaming.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Streaming.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Streaming.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Timestamp.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Timestamp.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Timestamp.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/TransitTunnel.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/TransitTunnel.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/TransitTunnel.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Transports.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Transports.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Transports.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/Tunnel.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/Tunnel.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/Tunnel.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/TunnelConfig.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/TunnelConfig.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/TunnelConfig.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/TunnelEndpoint.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/TunnelEndpoint.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/TunnelEndpoint.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/TunnelGateway.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/TunnelGateway.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/TunnelGateway.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/TunnelPool.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/TunnelPool.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/TunnelPool.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/api.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/api.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/api.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pd.dir/root/Documents/i2pd_aimafan/libi2pd/util.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd/util.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd/util.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdclient.dir/root/Documents/i2pd_aimafan/libi2pd_client/AddressBook.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd_client/AddressBook.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd_client/AddressBook.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdclient.dir/root/Documents/i2pd_aimafan/libi2pd_client/BOB.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd_client/BOB.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd_client/BOB.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdclient.dir/root/Documents/i2pd_aimafan/libi2pd_client/ClientContext.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd_client/ClientContext.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd_client/ClientContext.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdclient.dir/root/Documents/i2pd_aimafan/libi2pd_client/HTTPProxy.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd_client/HTTPProxy.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd_client/HTTPProxy.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdclient.dir/root/Documents/i2pd_aimafan/libi2pd_client/I2CP.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd_client/I2CP.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd_client/I2CP.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdclient.dir/root/Documents/i2pd_aimafan/libi2pd_client/I2PService.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd_client/I2PService.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd_client/I2PService.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdclient.dir/root/Documents/i2pd_aimafan/libi2pd_client/I2PTunnel.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd_client/I2PTunnel.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd_client/I2PTunnel.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdclient.dir/root/Documents/i2pd_aimafan/libi2pd_client/MatchedDestination.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd_client/MatchedDestination.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd_client/MatchedDestination.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdclient.dir/root/Documents/i2pd_aimafan/libi2pd_client/SAM.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd_client/SAM.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd_client/SAM.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdclient.dir/root/Documents/i2pd_aimafan/libi2pd_client/SOCKS.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd_client/SOCKS.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd_client/SOCKS.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdclient.dir/root/Documents/i2pd_aimafan/libi2pd_client/UDPTunnel.cpp.o -c /root/Documents/i2pd_aimafan/libi2pd_client/UDPTunnel.cpp",
+  "file": "/root/Documents/i2pd_aimafan/libi2pd_client/UDPTunnel.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/Afrikaans.cpp.o -c /root/Documents/i2pd_aimafan/i18n/Afrikaans.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/Afrikaans.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/Armenian.cpp.o -c /root/Documents/i2pd_aimafan/i18n/Armenian.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/Armenian.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/Chinese.cpp.o -c /root/Documents/i2pd_aimafan/i18n/Chinese.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/Chinese.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/Czech.cpp.o -c /root/Documents/i2pd_aimafan/i18n/Czech.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/Czech.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/English.cpp.o -c /root/Documents/i2pd_aimafan/i18n/English.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/English.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/French.cpp.o -c /root/Documents/i2pd_aimafan/i18n/French.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/French.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/German.cpp.o -c /root/Documents/i2pd_aimafan/i18n/German.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/German.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/I18N.cpp.o -c /root/Documents/i2pd_aimafan/i18n/I18N.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/I18N.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/Italian.cpp.o -c /root/Documents/i2pd_aimafan/i18n/Italian.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/Italian.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/Polish.cpp.o -c /root/Documents/i2pd_aimafan/i18n/Polish.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/Polish.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/Portuguese.cpp.o -c /root/Documents/i2pd_aimafan/i18n/Portuguese.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/Portuguese.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/Russian.cpp.o -c /root/Documents/i2pd_aimafan/i18n/Russian.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/Russian.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/Spanish.cpp.o -c /root/Documents/i2pd_aimafan/i18n/Spanish.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/Spanish.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/Swedish.cpp.o -c /root/Documents/i2pd_aimafan/i18n/Swedish.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/Swedish.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/Turkish.cpp.o -c /root/Documents/i2pd_aimafan/i18n/Turkish.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/Turkish.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/Turkmen.cpp.o -c /root/Documents/i2pd_aimafan/i18n/Turkmen.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/Turkmen.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/Ukrainian.cpp.o -c /root/Documents/i2pd_aimafan/i18n/Ukrainian.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/Ukrainian.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/libi2pdlang.dir/root/Documents/i2pd_aimafan/i18n/Uzbek.cpp.o -c /root/Documents/i2pd_aimafan/i18n/Uzbek.cpp",
+  "file": "/root/Documents/i2pd_aimafan/i18n/Uzbek.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/i2pd.dir/root/Documents/i2pd_aimafan/daemon/Daemon.cpp.o -c /root/Documents/i2pd_aimafan/daemon/Daemon.cpp",
+  "file": "/root/Documents/i2pd_aimafan/daemon/Daemon.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/i2pd.dir/root/Documents/i2pd_aimafan/daemon/HTTPServer.cpp.o -c /root/Documents/i2pd_aimafan/daemon/HTTPServer.cpp",
+  "file": "/root/Documents/i2pd_aimafan/daemon/HTTPServer.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/i2pd.dir/root/Documents/i2pd_aimafan/daemon/I2PControl.cpp.o -c /root/Documents/i2pd_aimafan/daemon/I2PControl.cpp",
+  "file": "/root/Documents/i2pd_aimafan/daemon/I2PControl.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/i2pd.dir/root/Documents/i2pd_aimafan/daemon/I2PControlHandlers.cpp.o -c /root/Documents/i2pd_aimafan/daemon/I2PControlHandlers.cpp",
+  "file": "/root/Documents/i2pd_aimafan/daemon/I2PControlHandlers.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/i2pd.dir/root/Documents/i2pd_aimafan/daemon/i2pd.cpp.o -c /root/Documents/i2pd_aimafan/daemon/i2pd.cpp",
+  "file": "/root/Documents/i2pd_aimafan/daemon/i2pd.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/i2pd.dir/root/Documents/i2pd_aimafan/daemon/UPnP.cpp.o -c /root/Documents/i2pd_aimafan/daemon/UPnP.cpp",
+  "file": "/root/Documents/i2pd_aimafan/daemon/UPnP.cpp"
+},
+{
+  "directory": "/root/Documents/i2pd_aimafan/build",
+  "command": "/usr/bin/g++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DOPENSSL_SUPPRESS_DEPRECATED -D_GLIBCXX_USE_NANOSLEEP=1 -D__AES__ -I/root/Documents/i2pd_aimafan/build/../libi2pd -I/root/Documents/i2pd_aimafan/build/../libi2pd_client -I/root/Documents/i2pd_aimafan/build/../i18n -I/root/Documents/i2pd_aimafan/build/../daemon  -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g -o CMakeFiles/i2pd.dir/root/Documents/i2pd_aimafan/daemon/UnixDaemon.cpp.o -c /root/Documents/i2pd_aimafan/daemon/UnixDaemon.cpp",
+  "file": "/root/Documents/i2pd_aimafan/daemon/UnixDaemon.cpp"
+}
+]

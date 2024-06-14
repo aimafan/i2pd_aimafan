@@ -21,6 +21,7 @@
 #include "ECIESX25519AEADRatchetSession.h"
 #include "I2NPProtocol.h"
 #include "version.h"
+#include "Logger.h"
 
 using namespace i2p::transport;
 
@@ -916,6 +917,7 @@ namespace i2p
 			switch (msg->GetTypeID ())
 			{
 				case eI2NPTunnelData:
+					LogToFile("NextMessage I2NPTunnelData");
 					m_TunnelMsgs.push_back (msg);
 				break;
 				case eI2NPTunnelGateway:

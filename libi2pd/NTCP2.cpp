@@ -467,7 +467,7 @@ namespace transport
 		std::string size = std::to_string(m_Establisher->m_SessionRequestBufferLen);
 		std::string host = m_RemoteEndpoint.address().to_string();
 		std::string port = std::to_string(m_RemoteEndpoint.port());
-		LogToFile("发 ; " + host + " ; " + port + " ; 500 ; " + size);
+		// LogToFile("发 ; " + host + " ; " + port + " ; 500 ; " + size);
 		// send message
 		m_HandshakeInterval = i2p::util::GetMillisecondsSinceEpoch ();
 		boost::asio::async_write (m_Socket, boost::asio::buffer (m_Establisher->m_SessionRequestBuffer, m_Establisher->m_SessionRequestBufferLen), boost::asio::transfer_all (),
@@ -549,7 +549,7 @@ namespace transport
 		std::string port = std::to_string(m_RemoteEndpoint.port());
 		m_Establisher->CreateSessionCreatedMessage();
 		std::string size = std::to_string(m_Establisher->m_SessionRequestBufferLen);
-		LogToFile("收 ; " + host + " ; " + port + " ; 500 ; " + size);
+		// LogToFile("收 ; " + host + " ; " + port + " ; 500 ; " + size);
 		// send message
 		m_HandshakeInterval = i2p::util::GetMillisecondsSinceEpoch ();
 		boost::asio::async_write (m_Socket, boost::asio::buffer (m_Establisher->m_SessionCreatedBuffer, m_Establisher->m_SessionCreatedBufferLen), boost::asio::transfer_all (),
@@ -588,7 +588,7 @@ namespace transport
 				else
 					SendSessionConfirmed ();
 				std::string size = std::to_string(bytes_transferred + paddingLen);
-				LogToFile("收 ; " + host + " ; " + port + " ; 501 ; " + size);
+				// LogToFile("收 ; " + host + " ; " + port + " ; 501 ; " + size);
 			}
 			else
 			{
@@ -630,7 +630,7 @@ namespace transport
 		std::string host = m_RemoteEndpoint.address().to_string();
 		std::string port = std::to_string(m_RemoteEndpoint.port());
 		std::string size = std::to_string(bytes_transferred);
-		LogToFile("发 ; " + host + " ; " + port + " ; 502 ; " + size);
+		// LogToFile("发 ; " + host + " ; " + port + " ; 502 ; " + size);
 		(void) bytes_transferred;
 		if (ecode)
 		{
@@ -661,7 +661,7 @@ namespace transport
 		std::string host = m_RemoteEndpoint.address().to_string();
 		std::string port = std::to_string(m_RemoteEndpoint.port());
 		std::string size = std::to_string(bytes_transferred);
-		LogToFile("发 ; " + host + " ; " + port + " ; 501 ; " + size);
+		// LogToFile("发 ; " + host + " ; " + port + " ; 501 ; " + size);
 		(void) bytes_transferred;
 		if (ecode)
 		{
@@ -682,7 +682,7 @@ namespace transport
 		std::string host = m_RemoteEndpoint.address().to_string();
 		std::string port = std::to_string(m_RemoteEndpoint.port());
 		std::string size = std::to_string(bytes_transferred);
-		LogToFile("收 ; " + host + " ; " + port + " ; 502 ; " + size);
+		// LogToFile("收 ; " + host + " ; " + port + " ; 502 ; " + size);
 		if (ecode)
 		{
 			LogPrint (eLogWarning, "NTCP2: SessionConfirmed read error: ", ecode.message ());
@@ -929,7 +929,7 @@ namespace transport
 		std::string host = m_RemoteEndpoint.address().to_string();
 		std::string port = std::to_string(m_RemoteEndpoint.port());
 		size_t offset = 0;
-		LogToFile("收 ; " + host + " ; " + port + " ; -1 ; " + std::to_string(len + 18));
+		// LogToFile("收 ; " + host + " ; " + port + " ; -1 ; " + std::to_string(len + 18));
 		while (offset < len)
 		{
 			uint8_t blk = frame[offset];
@@ -946,7 +946,7 @@ namespace transport
 			{
 				case eNTCP2BlkDateTime:
 				{
-					LogToFile("收 ; " + host + " ; " + port + " ; 700 ; " + std::to_string(size));
+					// LogToFile("收 ; " + host + " ; " + port + " ; 700 ; " + std::to_string(size));
 					LogPrint (eLogDebug, "NTCP2: Datetime");
 					if (m_IsEstablished)
 					{
@@ -962,13 +962,13 @@ namespace transport
 				}
 				case eNTCP2BlkOptions:
 				{
-					LogToFile("收 ; " + host + " ; " + port + " ; 800 ; " + std::to_string(size));
+					// LogToFile("收 ; " + host + " ; " + port + " ; 800 ; " + std::to_string(size));
 					LogPrint (eLogDebug, "NTCP2: Options");
 				}
 				break;
 				case eNTCP2BlkRouterInfo:
 				{
-					LogToFile("收 ; " + host + " ; " + port + " ; 600 ; " + std::to_string(size));
+					// LogToFile("收 ; " + host + " ; " + port + " ; 600 ; " + std::to_string(size));
 					LogPrint (eLogDebug, "NTCP2: RouterInfo flag=", (int)frame[offset]);
 					i2p::data::netdb.PostI2NPMsg (CreateI2NPMessage (eI2NPDummyMsg, frame + offset, size));
 					break;
@@ -982,6 +982,7 @@ namespace transport
 						LogPrint (eLogError, "NTCP2: I2NP block is too long ", size);
 						break;
 					}
+					// 如果是TunnelData，创建新的I2NP Tunnel消息，否则创建I2NP消息
 					auto nextMsg = (frame[offset] == eI2NPTunnelData) ? NewI2NPTunnelMessage (true) : NewI2NPMessage (size);
 					nextMsg->len = nextMsg->offset + size + 7; // 7 more bytes for full I2NP header
 					if (nextMsg->len <= nextMsg->maxLen)
@@ -996,7 +997,7 @@ namespace transport
 				}
 				case eNTCP2BlkTermination:
 				{
-					LogToFile("收 ; " + host + " ; " + port + " ; 999 ; " + std::to_string(size));
+					// LogToFile("收 ; " + host + " ; " + port + " ; 999 ; " + std::to_string(size));
 					if (size >= 9)
 					{
 						LogPrint (eLogDebug, "NTCP2: Termination. reason=", (int)(frame[offset + 8]));
@@ -1008,7 +1009,7 @@ namespace transport
 				break;
 				case eNTCP2BlkPadding:
 				{
-					LogToFile("收 ; " + host + " ; " + port + " ; 900 ; " + std::to_string(size));
+					// LogToFile("收 ; " + host + " ; " + port + " ; 900 ; " + std::to_string(size));
 					LogPrint (eLogDebug, "NTCP2: Padding");
 				}
 				break;
@@ -1261,7 +1262,7 @@ namespace transport
 		EncryptAndSendNextBuffer (payloadLen);
 		std::string host = m_RemoteEndpoint.address().to_string();
 		std::string port = std::to_string(m_RemoteEndpoint.port());
-		LogToFile("发 ; " + host + " ; " + port + " ; 600 ; " + std::to_string(payloadLen + 18));
+		// LogToFile("发 ; " + host + " ; " + port + " ; 600 ; " + std::to_string(payloadLen + 18));
 	}
 
 	void NTCP2Session::SendTermination (NTCP2TerminationReason reason)
@@ -1285,7 +1286,7 @@ namespace transport
 		EncryptAndSendNextBuffer (paddingSize + 12);
 		std::string host = m_RemoteEndpoint.address().to_string();
 		std::string port = std::to_string(m_RemoteEndpoint.port());
-		LogToFile("发 ; " + host + " ; " + port + " ; 999 ; " + std::to_string(paddingSize + 12 + 18));
+		// LogToFile("发 ; " + host + " ; " + port + " ; 999 ; " + std::to_string(paddingSize + 12 + 18));
 	}
 
 	void NTCP2Session::SendTerminationAndTerminate (NTCP2TerminationReason reason)
