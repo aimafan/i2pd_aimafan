@@ -13,6 +13,7 @@
 #include "NetDb.hpp"
 #include "Config.h"
 #include "SSU2.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -30,10 +31,12 @@ namespace transport
 	}
 
 	void SSU2Server::Start ()
+	// 入口函数
 	{
 		if (!IsRunning ())
 		{
 			StartIOService ();
+			// 读取配置
 			i2p::config::GetOption ("ssu2.published", m_IsPublished);
 			i2p::config::GetOption("nettime.frompeers", m_IsSyncClockFromPeers);
 			bool found = false;
@@ -41,11 +44,14 @@ namespace transport
 			if (!addresses) return;
 			for (const auto& address: *addresses)
 			{
+				LogToFile("[SSU2] address is " + address->host.to_string());
 				if (!address) continue;
 				if (address->transportStyle == i2p::data::RouterInfo::eTransportSSU2)
 				{
 					if (m_IsThroughProxy)
 					{
+						LogToFile("[SSU2] address is throughproxy" + address->host.to_string());
+						// LogToFile("[SSU2] is through proxy " + address)
 						found = true;
 						if (address->IsV6 ())
 						{
