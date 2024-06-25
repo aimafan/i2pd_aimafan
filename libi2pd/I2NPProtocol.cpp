@@ -840,6 +840,7 @@ namespace i2p
 
 	void HandleI2NPMessage (std::shared_ptr<I2NPMessage> msg)
 	{
+		// 处理I2NP
 		if (msg)
 		{
 			uint8_t typeID = msg->GetTypeID ();
@@ -847,19 +848,26 @@ namespace i2p
 			switch (typeID)
 			{
 				case eI2NPTunnelData:
+					LogToFile("处理TunnelData数据");
 					if (!msg->from)
 						i2p::tunnel::tunnels.PostTunnelData (msg);
 				break;
 				case eI2NPTunnelGateway:
+					LogToFile("处理TunnelGateway数据");
 					if (!msg->from)
 						i2p::tunnel::tunnels.PostTunnelData (msg);
 				break;
 				case eI2NPGarlic:
 				{
-					if (msg->from && msg->from->GetTunnelPool ())
+					LogToFile("处理Garlic数据");
+					if (msg->from && msg->from->GetTunnelPool ()){	// 有来源，并且来源是个隧道池
+						LogToFile("从隧道里面来的");
 						msg->from->GetTunnelPool ()->ProcessGarlicMessage (msg);
-					else
+					}
+					else{		// 没有来源，来源没有隧道池
+						LogToFile("不是从隧道里面来的");
 						i2p::context.ProcessGarlicMessage (msg);
+					}
 					break;
 				}
 				case eI2NPDatabaseStore:
@@ -917,7 +925,6 @@ namespace i2p
 			switch (msg->GetTypeID ())
 			{
 				case eI2NPTunnelData:
-					LogToFile("NextMessage I2NPTunnelData");
 					m_TunnelMsgs.push_back (msg);
 				break;
 				case eI2NPTunnelGateway:
@@ -933,6 +940,7 @@ namespace i2p
 	{
 		if (!m_TunnelMsgs.empty ())
 		{
+			// 如果不空，将数据推送出去
 			i2p::tunnel::tunnels.PostTunnelData (m_TunnelMsgs);
 			m_TunnelMsgs.clear ();
 		}

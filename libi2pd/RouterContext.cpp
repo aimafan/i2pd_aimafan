@@ -23,6 +23,7 @@
 #include "Transports.h"
 #include "Tunnel.h"
 #include "RouterContext.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -1166,30 +1167,37 @@ namespace i2p
 	}
 
 	void RouterContext::ProcessGarlicMessage (std::shared_ptr<I2NPMessage> msg)
+	// 提交到服务对象
 	{
 		if (m_Service)
 			m_Service->GetService ().post (std::bind (&RouterContext::PostGarlicMessage, this, msg));
-		else
+		else{
+			LogToFile("Router: service is NULL");
 			LogPrint (eLogError, "Router: service is NULL");
+		}
 	}
 
 	void RouterContext::PostGarlicMessage (std::shared_ptr<I2NPMessage> msg)
 	{
-		uint8_t * buf = msg->GetPayload ();
+		uint8_t * buf = msg->GetPayload ();		// 获得有效载荷
 		uint32_t len = bufbe32toh (buf);
 		if (len > msg->GetLength ())
 		{
+			LogToFile("Router: garlic message length " + std::to_string(len) + " exceeds I2NP message length " + std::to_string(msg->GetLength()));
 			LogPrint (eLogWarning, "Router: garlic message length ", len, " exceeds I2NP message length ", msg->GetLength ());
 			return;
 		}
-		buf += 4;
+		buf += 4;		// 越过Length
 		if (!HandleECIESx25519TagMessage (buf, len)) // try tag first
 		{
 			// then Noise_N one-time decryption
 			if (m_ECIESSession)
+				// 解密数据
 				m_ECIESSession->HandleNextMessage (buf, len);
-			else
+			else{
+				LogToFile("ERROR Router: Session is not set for ECIES router");
 				LogPrint (eLogError, "Router: Session is not set for ECIES router");
+			}
 		}
 	}	
 	

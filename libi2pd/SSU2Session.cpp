@@ -13,6 +13,7 @@
 #include "Gzip.h"
 #include "NetDb.hpp"
 #include "SSU2.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -115,18 +116,31 @@ namespace transport
 	{
 	}
 
+	// 大致步骤
+	// SessionRequest ------------------->
+	// <------------------- SessionCreated
+	// SessionConfirmed ----------------->
+	// 如果没有token
+	// TokenRequest --------------------->
+	// <---------------------------  Retry
+	// SessionRequest ------------------->
+	// <------------------- SessionCreated
+	// SessionConfirmed ----------------->
 	void SSU2Session::Connect ()
 	{
 		if (m_State == eSSU2SessionStateUnknown || m_State == eSSU2SessionStateTokenReceived)
+		// 查看Session的状态
 		{
 			LogPrint(eLogDebug, "SSU2: Connecting to ", GetRemoteEndpoint (),
 				" (", i2p::data::GetIdentHashAbbreviation (GetRemoteIdentity ()->GetIdentHash ()), ")");
-			ScheduleConnectTimer ();
-			auto token = m_Server.FindOutgoingToken (m_RemoteEndpoint);
+			ScheduleConnectTimer ();		// 调度连接定时器
+			auto token = m_Server.FindOutgoingToken (m_RemoteEndpoint);		// 查找令牌
 			if (token)
+				// 用令牌发送会话请求
 				SendSessionRequest (token);
 			else
-			{
+			{	
+				// 设会话状态，然后发送令牌请求
 				m_State = eSSU2SessionStateUnknown;
 				SendTokenRequest ();
 			}
@@ -634,6 +648,7 @@ namespace transport
 
 	void SSU2Session::SendSessionRequest (uint64_t token)
 	{
+		// 第一次握手
 		// we are Alice
 		m_EphemeralKeys = i2p::transport::transports.GetNextX25519KeysPair ();
 		m_SentHandshakePacket.reset (new HandshakePacket);
@@ -746,6 +761,7 @@ namespace transport
 
 	void SSU2Session::SendSessionCreated (const uint8_t * X)
 	{
+		// 第二次握手
 		// we are Bob
 		m_EphemeralKeys = i2p::transport::transports.GetNextX25519KeysPair ();
 		m_SentHandshakePacket.reset (new HandshakePacket);
@@ -1528,6 +1544,8 @@ namespace transport
 
 	void SSU2Session::HandlePayload (const uint8_t * buf, size_t len)
 	{
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
 		size_t offset = 0;
 		while (offset < len)
 		{
@@ -1562,6 +1580,7 @@ namespace transport
 				case eSSU2BlkI2NPMessage:
 				{
 					LogPrint (eLogDebug, "SSU2: I2NP message");
+					LogToFile("SSU2 ; 收 ; " + host + " ; " + port + " ; " + std::to_string(buf[offset]) + " ; " + std::to_string(size));
 					auto nextMsg = (buf[offset] == eI2NPTunnelData) ? NewI2NPTunnelMessage (true) : NewI2NPShortMessage ();
 					nextMsg->len = nextMsg->offset + size + 7; // 7 more bytes for full I2NP header
 					memcpy (nextMsg->GetNTCP2Header (), buf + offset, size);

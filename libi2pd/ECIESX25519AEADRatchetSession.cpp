@@ -19,6 +19,7 @@
 #include "TunnelPool.h"
 #include "Transports.h"
 #include "ECIESX25519AEADRatchetSession.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -301,12 +302,15 @@ namespace garlic
 	void ECIESX25519AEADRatchetSession::HandlePayload (const uint8_t * buf, size_t len, const std::shared_ptr<ReceiveRatchetTagSet>& receiveTagset, int index)
 	{
 		size_t offset = 0;
+		// 解析每个块，每个块的类别都不一样
+		LogToFile("start handle paylaod");
 		while (offset < len)
 		{
 			uint8_t blk = buf[offset];
 			offset++;
 			auto size = bufbe16toh (buf + offset);
 			offset += 2;
+			LogToFile ("Garlic: Block type " + std::to_string((int)blk)+ " of size "+ std::to_string(size));
 			LogPrint (eLogDebug, "Garlic: Block type ", (int)blk, " of size ", size);
 			if (size > len)
 			{
@@ -315,18 +319,18 @@ namespace garlic
 			}
 			switch (blk)
 			{
-				case eECIESx25519BlkGalicClove:
+				case eECIESx25519BlkGalicClove:	// 11
 					if (GetOwner ())
 						GetOwner ()->HandleECIESx25519GarlicClove (buf + offset, size);
 				break;
-				case eECIESx25519BlkNextKey:
+				case eECIESx25519BlkNextKey:	// 7
 					LogPrint (eLogDebug, "Garlic: Next key");
 					if (receiveTagset)
 						HandleNextKey (buf + offset, size, receiveTagset);
 					else
 						LogPrint (eLogError, "Garlic: Unexpected next key block");
 				break;
-				case eECIESx25519BlkAck:
+				case eECIESx25519BlkAck:		// 8
 				{
 					LogPrint (eLogDebug, "Garlic: Ack");
 					int numAcks = size >> 2; // /4
@@ -338,26 +342,26 @@ namespace garlic
 					}
 					break;
 				}
-				case eECIESx25519BlkAckRequest:
+				case eECIESx25519BlkAckRequest:		// 9
 				{
 					LogPrint (eLogDebug, "Garlic: Ack request");
 					if (receiveTagset)
 						m_AckRequests.push_back ({receiveTagset->GetTagSetID (), index});
 					break;
 				}
-				case eECIESx25519BlkTermination:
+				case eECIESx25519BlkTermination:	// 4
 					LogPrint (eLogDebug, "Garlic: Termination");
 					if (GetOwner ())
 						GetOwner ()->RemoveECIESx25519Session (m_RemoteStaticKey);
 					if (receiveTagset) receiveTagset->Expire ();
 				break;
-				case eECIESx25519BlkDateTime:
+				case eECIESx25519BlkDateTime:		// 0
 					LogPrint (eLogDebug, "Garlic: Datetime");
 				break;
-				case eECIESx25519BlkOptions:
+				case eECIESx25519BlkOptions:		// 5
 					LogPrint (eLogDebug, "Garlic: Options");
 				break;
-				case eECIESx25519BlkPadding:
+				case eECIESx25519BlkPadding:		// 254
 					LogPrint (eLogDebug, "Garlic: Padding");
 				break;
 				default:
@@ -1086,24 +1090,29 @@ namespace garlic
 
 	bool RouterIncomingRatchetSession::HandleNextMessage (const uint8_t * buf, size_t len)
 	{
-		if (!GetOwner ()) return false;
+		if (!GetOwner ()) {LogToFile("GetOwner false");return false;}		// 所有者是否存在
 		m_CurrentNoiseState = GetNoiseState ();
 		// we are Bob
 		m_CurrentNoiseState.MixHash (buf, 32);
+		// 解密共享密钥
 		uint8_t sharedSecret[32];
 		if (!GetOwner ()->Decrypt (buf, sharedSecret, i2p::data::CRYPTO_KEY_TYPE_ECIES_X25519_AEAD)) // x25519(bsk, aepk)
 		{
+			LogToFile("Garlic: Incorrect N ephemeral public key");
 			LogPrint (eLogWarning, "Garlic: Incorrect N ephemeral public key");
 			return false;
 		}
+		// 共享密钥与Noise状态密钥混合
 		m_CurrentNoiseState.MixKey (sharedSecret);
 		buf += 32; len -= 32;
 		uint8_t nonce[12];
 		CreateNonce (0, nonce);
+		// 解密有效载荷
 		std::vector<uint8_t> payload (len - 16);
 		if (!i2p::crypto::AEADChaCha20Poly1305 (buf, len - 16, m_CurrentNoiseState.m_H, 32,
 			m_CurrentNoiseState.m_CK + 32, nonce, payload.data (), len - 16, false)) // decrypt
 		{
+			LogToFile ("Garlic: Payload for router AEAD verification failed");
 			LogPrint (eLogWarning, "Garlic: Payload for router AEAD verification failed");
 			return false;
 		}

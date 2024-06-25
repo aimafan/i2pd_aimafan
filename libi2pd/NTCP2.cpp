@@ -975,7 +975,7 @@ namespace transport
 				}
 				case eNTCP2BlkI2NPMessage:
 				{
-					LogToFile("收 ; " + host + " ; " + port + " ; " + std::to_string(frame[offset]) + " ; " + std::to_string(size));
+					LogToFile("NTCP2 ; 收 ; " + host + " ; " + port + " ; " + std::to_string(frame[offset]) + " ; " + std::to_string(size));
 					LogPrint (eLogDebug, "NTCP2: I2NP");
 					if (size > I2NP_MAX_MESSAGE_SIZE)
 					{
@@ -1081,7 +1081,7 @@ namespace transport
 			}
 
 			bufs.push_back (boost::asio::buffer (buf, len));
-			LogToFile("发 ; " + host + " ; " + port + " ; " + std::to_string(it->GetTypeID()) + " ; " + std::to_string(len));
+			// LogToFile("发 ; " + host + " ; " + port + " ; " + std::to_string(it->GetTypeID()) + " ; " + std::to_string(len));
 		}
 
 		if (!macBuf) // last block was not enough for MAC

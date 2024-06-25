@@ -13,6 +13,7 @@
 #include "NetDb.hpp"
 #include "Config.h"
 #include "SSU2.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -750,15 +751,22 @@ namespace transport
 					return false;
 				}
 			}
-
+			// LogToFile("SSU2建立连接 address：" + address->host.to_string());
 			auto session = std::make_shared<SSU2Session> (*this, router, address);
 			if (peerTest)
+				// 对等测试
 				session->SetOnEstablished ([session]() {session->SendPeerTest (); });
 
-			if (address->UsesIntroducer ())
+			if (address->UsesIntroducer ()){
+				// LogToFile("UseIntroducer");
 				GetService ().post (std::bind (&SSU2Server::ConnectThroughIntroducer, this, session));
-			else if (isValidEndpoint) // we can't connect without endpoint
+			}
+			else if (isValidEndpoint){ // we can't connect without endpoint
+				// 一般都是这个，检测对方host和port是否有效
+				// LogToFile("isvalidendpoint");
+				// 将session->Connect()提交到server中
 				GetService ().post ([session]() { session->Connect (); });
+			}
 			else
 				return false;
 		}

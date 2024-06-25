@@ -14,6 +14,7 @@
 #include "Tunnel.h"
 #include "Transports.h"
 #include "TransitTunnel.h"
+#include "Logger.h"
 
 namespace i2p
 {

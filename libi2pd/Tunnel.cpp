@@ -24,6 +24,7 @@
 #include "TunnelPool.h"
 #include "util.h"
 #include "ECIESX25519AEADRatchetSession.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -250,9 +251,13 @@ namespace tunnel
 
 	void InboundTunnel::HandleTunnelDataMsg (std::shared_ptr<I2NPMessage>&& msg)
 	{
-		if (GetState () != eTunnelStateExpiring) SetState (eTunnelStateEstablished); // incoming messages means a tunnel is alive
+		// 检查和设置隧道状态
+		if (GetState () != eTunnelStateExpiring) SetState (eTunnelStateEstablished); // 有数据说明隧道还活着
+		// 对传入数据进行加密
 		EncryptTunnelMsg (msg, msg);
+		// 设置消息来源，是自己
 		msg->from = GetSharedFromThis ();
+		// 处理解密后的msg
 		m_Endpoint.HandleDecryptedTunnelDataMsg (msg);
 	}
 
@@ -321,6 +326,7 @@ namespace tunnel
 			switch (msg.deliveryType)
 			{
 				case eDeliveryTypeLocal:
+					LogToFile("eDeliveryTypeLocal");
 					HandleI2NPMessage (msg.data);
 				break;
 				case eDeliveryTypeTunnel:
@@ -481,6 +487,7 @@ namespace tunnel
 		{
 			try
 			{
+				// 从队列拿消息，超时时间1s
 				auto msg = m_Queue.GetNextWithTimeout (1000); // 1 sec
 				if (msg)
 				{
@@ -496,20 +503,22 @@ namespace tunnel
 							case eI2NPTunnelData:
 							case eI2NPTunnelGateway:
 							{
+								// 提取隧道ID
 								tunnelID = bufbe32toh (msg->GetPayload ());
 								if (tunnelID == prevTunnelID)
-									tunnel = prevTunnel;
+									tunnel = prevTunnel;	// 如果隧道ID一样，复用上次的隧道
 								else if (prevTunnel)
-									prevTunnel->FlushTunnelDataMsgs ();
+									prevTunnel->FlushTunnelDataMsgs ();	// 如果和上次隧道不一样的话，清除上次隧道消息数据
 
 								if (!tunnel)
-									tunnel = GetTunnel (tunnelID);
+									tunnel = GetTunnel (tunnelID);		// 第一次创建隧道对象
 								if (tunnel)
 								{
-									if (typeID == eI2NPTunnelData)
-										tunnel->HandleTunnelDataMsg (std::move (msg));
+									if (typeID == eI2NPTunnelData){
+										tunnel->HandleTunnelDataMsg (std::move (msg));	// 处理TunnelData
+									}
 									else // tunnel gateway assumed
-										HandleTunnelGatewayMsg (tunnel, msg);
+										HandleTunnelGatewayMsg (tunnel, msg);		// 处理TunnelGateway
 								}
 								else
 									LogPrint (eLogWarning, "Tunnel: Tunnel not found, tunnelID=", tunnelID, " previousTunnelID=", prevTunnelID, " type=", (int)typeID);
