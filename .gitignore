@@ -279,3 +279,4 @@ qt/build-*.sh*
 
 
 .vscode
+build/compile_commands.json
