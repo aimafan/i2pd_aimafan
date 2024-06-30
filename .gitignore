@@ -277,3 +277,6 @@ android/libs/
 
 qt/build-*.sh*
 
+bushu
+.vscode
+build/compile_commands.json

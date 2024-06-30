@@ -32,6 +32,8 @@
 #include "version.h"
 #include "util.h"
 #include "KadDHT.h"
+#include "KafKaProducer.h"
+#include "Config.h"
 
 namespace i2p
 {
@@ -176,6 +178,7 @@ namespace data
 
 			friend class NetDbRequests;
 			NetDbRequests m_Requests;
+			KafkaProducer producer;
 
 			bool m_PersistProfiles;
 			std::future<void> m_SavingProfiles, m_DeletingProfiles;

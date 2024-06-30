@@ -65,6 +65,8 @@ namespace config {
 			("share", value<int>()->default_value(100),                       "Limit of transit traffic from max bandwidth in percents. (default: 100)")
 			("ntcp", bool_switch()->default_value(false),                     "Ignored. Always false")
 			("ssu", bool_switch()->default_value(false),                      "Ignored. Always false")
+			("kafkaserver", value<std::string>()->default_value("127.0.0.1:9092"),               "kafka server")
+			("kafkatopic", value<std::string>()->default_value("default"),                       "kafka topic")
 			("ntcpproxy", value<std::string>()->default_value(""),            "Ignored")
 #ifdef _WIN32
 			("svcctl", value<std::string>()->default_value(""),               "Ignored")

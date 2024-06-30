@@ -30,13 +30,128 @@
 
 using namespace i2p::transport;
 
+/*B============2. 收集routerinfo结点工具函数===========*/
+
+std::string getsigntype(uint16_t crytype) {
+    switch (crytype) {
+        case i2p::data::SIGNING_KEY_TYPE_DSA_SHA1:
+            return "DSA_SHA1";
+        case i2p::data::SIGNING_KEY_TYPE_ECDSA_SHA256_P256:
+            return "ECDSA_SHA256_P256";
+        case i2p::data::SIGNING_KEY_TYPE_ECDSA_SHA384_P384:
+            return "ECDSA_SHA384_P384";
+        case i2p::data::SIGNING_KEY_TYPE_ECDSA_SHA512_P521:
+            return "ECDSA_SHA512_P521";
+        case i2p::data::SIGNING_KEY_TYPE_RSA_SHA256_2048:
+            return "RSA_SHA256_2048";
+        case i2p::data::SIGNING_KEY_TYPE_RSA_SHA384_3072:
+            return "RSA_SHA384_3072";
+        case i2p::data::SIGNING_KEY_TYPE_RSA_SHA512_4096:
+            return "RSA_SHA512_4096";
+        case i2p::data::SIGNING_KEY_TYPE_EDDSA_SHA512_ED25519:
+            return "EDDSA_SHA512_ED25519";
+        case i2p::data::SIGNING_KEY_TYPE_EDDSA_SHA512_ED25519ph:
+            return "EDDSA_SHA512_ED25519ph";
+        case i2p::data::SIGNING_KEY_TYPE_GOSTR3410_CRYPTO_PRO_A_GOSTR3411_256:
+            return "GOSTR3410_CRYPTO_PRO_A_GOSTR3411_256";
+        case i2p::data::SIGNING_KEY_TYPE_GOSTR3410_TC26_A_512_GOSTR3411_512:
+            return "GOSTR3410_TC26_A_512_GOSTR3411_512";
+        case i2p::data::SIGNING_KEY_TYPE_REDDSA_SHA512_ED25519:
+            return "REDDSA_SHA512_ED25519";
+        default:
+            return "Unknown";
+    }
+}
+std::string capsToString(uint8_t caps) {
+    // 将caps翻译为对应的字符串
+	// U: 不可达
+	// H: 隐藏
+	// R：可达
+	// P：>256KBps
+	// N：<=256KBps and >48KBps
+    std::string result;
+    if (caps & 32) result += "U";
+    if (caps & 16) result += "H";
+    if (caps & 8) result += "R";
+    if (caps & 4) result += "P";
+    if (caps & 2) result += "N";
+
+    return result;
+}
+
+std::string insertDecimalPoint(int number) {
+    // 转换整数为字符串
+    std::string numberString = std::to_string(number);
+
+    // 插入小数点
+    if (numberString.length() >= 3) {
+        numberString.insert(numberString.length() - 2, ".");
+    } else {
+        // 如果数字小于三位，前面补0，如12变为"0.12"
+        numberString.insert(0, "0.");
+    }
+
+    return numberString;
+}
+
+
+std::string BytesToHexString(const uint8_t* bytes, size_t length) {
+    std::stringstream ss;
+    ss << std::hex << std::setw(2) << std::setfill('0');
+    for (size_t i = 0; i < length; ++i) {
+        ss << "\\x" << std::setw(2) << static_cast<int>(bytes[i]);
+    }
+    return ss.str();
+}
+
+std::string getcryptotype(uint16_t crytype){
+	if(crytype == i2p::data::CRYPTO_KEY_TYPE_ELGAMAL){
+		return "ELGAMAL";
+	} else if( crytype == i2p::data::CRYPTO_KEY_TYPE_ECIES_X25519_AEAD){
+		return "ECIES_X25519_AEAD";
+	} else if( crytype == i2p::data::CRYPTO_KEY_TYPE_ECIES_P256_SHA256_AES256CBC){
+		return "ECIES_P256_SHA256_AES256CBC";
+	}else if (crytype == i2p::data::CRYPTO_KEY_TYPE_ECIES_P256_SHA256_AES256CBC_TEST){
+		return "ECIES_P256_SHA256_AES256CBC_TEST";
+	} else if (crytype == i2p::data::CRYPTO_KEY_TYPE_ECIES_GOSTR3410_CRYPTO_PRO_A_SHA256_AES256CBC){
+		return "ECIES_GOSTR3410_CRYPTO_PRO_A_SHA256_AES256CBC";
+	}else{
+		return "Unknown";
+	}
+	
+}
+
+/*
+	const uint16_t CRYPTO_KEY_TYPE_ELGAMAL = 0;
+	const uint16_t CRYPTO_KEY_TYPE_ECIES_P256_SHA256_AES256CBC = 1;
+	const uint16_t CRYPTO_KEY_TYPE_ECIES_X25519_AEAD = 4;
+	const uint16_t CRYPTO_KEY_TYPE_ECIES_P256_SHA256_AES256CBC_TEST = 65280; // TODO: remove later
+	const uint16_t CRYPTO_KEY_TYPE_ECIES_GOSTR3410_CRYPTO_PRO_A_SHA256_AES256CBC = 65281; // TODO: use GOST R 34.11 instead SHA256 and 
+*/
+
+std::string getcryptotype2(i2p::data::CryptoKeyType crytype){
+	if(crytype == i2p::data::CRYPTO_KEY_TYPE_ELGAMAL){
+		return "ELGAMAL";
+	} else if (crytype == i2p::data::CRYPTO_KEY_TYPE_ECIES_X25519_AEAD){
+		return "ECIES_X25519_AEAD";
+	} else if( crytype == i2p::data::CRYPTO_KEY_TYPE_ECIES_P256_SHA256_AES256CBC){
+		return "ECIES_P256_SHA256_AES256CBC";
+	}else if (crytype == i2p::data::CRYPTO_KEY_TYPE_ECIES_P256_SHA256_AES256CBC_TEST){
+		return "ECIES_P256_SHA256_AES256CBC_TEST";
+	} else if (crytype == i2p::data::CRYPTO_KEY_TYPE_ECIES_GOSTR3410_CRYPTO_PRO_A_SHA256_AES256CBC){
+		return "ECIES_GOSTR3410_CRYPTO_PRO_A_SHA256_AES256CBC";
+	}else{
+		return "Unknown";
+	}
+	
+}
 namespace i2p
 {
 namespace data
 {
 	NetDb netdb;
 
-	NetDb::NetDb (): m_IsRunning (false), m_Thread (nullptr), m_Reseeder (nullptr), m_Storage("netDb", "r", "routerInfo-", "dat"), m_PersistProfiles (true)
+	NetDb::NetDb (): m_IsRunning (false), m_Thread (nullptr), m_Reseeder (nullptr), m_Storage("netDb", "r", "routerInfo-", "dat"), m_PersistProfiles (true), producer()
 	{
 	}
 
@@ -109,6 +224,11 @@ namespace data
 		uint64_t lastManage = 0, lastExploratory = 0, lastManageRequest = 0;
 		uint64_t lastProfilesCleanup = i2p::util::GetMonotonicMilliseconds (), lastObsoleteProfilesCleanup = lastProfilesCleanup;
 		int16_t profilesCleanupVariance = 0, obsoleteProfilesCleanVariance = 0;
+
+		std::string kafka_server, kafka_topic;
+		i2p::config::GetOption("kafkaserver", kafka_server);
+		i2p::config::GetOption("kafkatopic", kafka_topic);
+		producer.KafkaProducer_connect(kafka_server, kafka_topic, 0);
 
 		while (m_IsRunning)
 		{
@@ -206,6 +326,7 @@ namespace data
 			
 				if (mts >= lastExploratory + 30000) // exploratory every 30 seconds
 				{
+					Explore(10);
 					auto numRouters = m_RouterInfos.size ();
 					if (!numRouters)
 						throw std::runtime_error("No known routers, reseed seems to be totally failed");
@@ -259,6 +380,96 @@ namespace data
 		auto r = FindRouter (ident);
 		if (r)
 		{
+			/*B===================2 将添加的routerinfo数据加入到数据库中==================*/
+
+				std::string hexString = BytesToHexString(r->GetRouterIdentity()->GetEncryptionPublicKey(), 256);
+
+				// cryptokeytype   VARCHAR(64)
+				std::string cryptokeytype = getcryptotype(r->GetRouterIdentity()->GetCryptoKeyType());
+				std::string singningkeytype = getsigntype(r->GetRouterIdentity()->GetSigningKeyType());
+
+				std::string signkey;
+
+				if(r->GetRouterIdentity()->GetSigningPublicKeyLen () > 128){
+					signkey = "null";
+				} else{
+					signkey = BytesToHexString(r->GetRouterIdentity()->GetSigningPublicKeyBuffer(), 256 - r->GetRouterIdentity()->GetSigningPublicKeyLen ());
+				}
+				std::string ntcp2_ipv4, ntcp2_s, ntcp2_i, ntcp2_ipv6;
+				int ntcp2_ipv6_port, ntcp2_port;
+				if(r->GetNTCP2V4Address() ){
+					if( r->GetNTCP2V4Address()->host.to_string() != "0.0.0.0"){
+						ntcp2_ipv4 = r->GetNTCP2V4Address()->host.to_string();
+						ntcp2_port = r->GetNTCP2V4Address()->port;
+						ntcp2_s = r->GetNTCP2V4Address()->s.ToBase64();
+						ntcp2_i = r->GetNTCP2V4Address()->i.ToBase64().substr(0, 22);
+					}else{
+						ntcp2_ipv4 = " ";
+						ntcp2_port = 0;
+						ntcp2_s = " ";
+						ntcp2_i = " ";
+					}
+				}
+				else{
+					ntcp2_ipv4 = " ";
+					ntcp2_port = 0;
+					ntcp2_s = " ";
+					ntcp2_i = " ";
+				}
+
+				if(r->GetNTCP2V6Address()){
+					if (r->GetNTCP2V6Address()->host.to_string() != "0.0.0.0"){
+						ntcp2_ipv6 = r->GetNTCP2V6Address()->host.to_string();
+						ntcp2_ipv6_port = r->GetNTCP2V6Address()->port;
+					}else{
+						ntcp2_ipv6 = " ";
+						ntcp2_ipv6_port = 0;
+					}
+				}else{
+					ntcp2_ipv6 = " ";
+					ntcp2_ipv6_port = 0;
+				}
+				
+				std::string ssu_ipv4, ssu_ipv6;
+				int ssu_ipv4_port, ssu_ipv6_port;
+				if(r->GetSSU2V4Address()){
+					if(r->GetSSU2V4Address()->host.to_string() != "0.0.0.0"){
+						ssu_ipv4 = r->GetSSU2V4Address()->host.to_string();
+						ssu_ipv4_port = r->GetSSU2V4Address()->port;
+					}else{
+						ssu_ipv4 = " ";
+						ssu_ipv4_port = 0;
+					}
+				}else{
+					ssu_ipv4 = " ";
+					ssu_ipv4_port = 0;
+				}
+
+				if(r->GetSSU2V6Address() ){
+					if (r->GetSSU2V6Address()->host.to_string() != "0.0.0.0"){
+						ssu_ipv6 = r->GetSSU2V6Address()->host.to_string();
+						ssu_ipv6_port = r->GetSSU2V6Address()->port;
+					}else{
+						ssu_ipv6 = " ";
+						ssu_ipv6_port = 0;
+					}
+				}else{
+					ssu_ipv6 = " ";
+					ssu_ipv6_port = 0;
+				}
+				
+				bool isfloodfill = r->IsFloodfill();
+				std::string caps = capsToString(r->GetCaps());
+				std::string version = insertDecimalPoint(r->GetVersion());
+				std::string netId = "2";
+				uint64_t public_time = r->GetTimestamp();		// routerinfo的发布时间
+				std::string message = ident.ToBase64() + "[|]" + std::to_string(isfloodfill) + "[|]" + caps + "[|]" + version + "[|]" + netId + "[|]" + std::to_string(public_time) + "[|]" + cryptokeytype + "[|]" + singningkeytype + "[|]" +
+                          ntcp2_ipv4 + "[|]" + std::to_string(ntcp2_port) + "[|]" + ntcp2_s + "[|]" + ntcp2_i + "[|]" +
+                          ntcp2_ipv6 + "[|]" + std::to_string(ntcp2_ipv6_port) + "[|]" + ssu_ipv4 + "[|]" +
+                          std::to_string(ssu_ipv4_port) + "[|]" + ssu_ipv6 + "[|]" + std::to_string(ssu_ipv6_port);
+				producer.pushMessage("Routerinfo[|]" + message);
+
+			/*E=====================================================================*/
 			if (r->IsNewer (buf, len))
 			{
 				bool wasFloodfill = r->IsFloodfill ();
