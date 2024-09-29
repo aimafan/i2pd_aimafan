@@ -2388,10 +2388,13 @@ namespace transport
 
 	void SSU2Session::HandleI2NPMsg (std::shared_ptr<I2NPMessage>&& msg)
 	{
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
 		if (!msg) return;
 		uint32_t msgID = msg->GetMsgID ();
 		if (!msg->IsExpired ())
 		{
+			msg->SetIPandPort(host, port);
 			// m_LastActivityTimestamp is updated in ProcessData before
 			if (m_ReceivedI2NPMsgIDs.emplace (msgID, (uint32_t)GetLastActivityTimestamp ()).second)
 				m_Handler.PutNextMessage (std::move (msg));

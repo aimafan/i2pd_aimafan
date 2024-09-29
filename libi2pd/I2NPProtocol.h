@@ -166,6 +166,18 @@ namespace tunnel
 		std::function<void ()> onDrop;
 		uint64_t enqueueTime; // monotonic microseconds
 
+		/////////////////////////////
+		// 构建IP和from
+		std::string from_ip;
+		std::string from_port;
+		void SetIPandPort( std::string ip, std::string port) {
+			from_ip = ip;
+			from_port = port;
+		}
+		std::string GetIP() { return from_ip;}
+		std::string GetPort() { return from_port;}
+		/////////////////////////////
+
 		I2NPMessage (): buf (nullptr), len (I2NP_HEADER_SIZE + 2),
 			offset(2), maxLen (0), from (nullptr), enqueueTime (0) {}; // reserve 2 bytes for NTCP header
 

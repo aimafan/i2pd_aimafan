@@ -21,6 +21,8 @@
 #include "ECIESX25519AEADRatchetSession.h"
 #include "I2NPProtocol.h"
 #include "version.h"
+#include "Logger.h"
+#include "Logger_transport.h"
 
 using namespace i2p::transport;
 
@@ -376,30 +378,39 @@ namespace i2p
 		return !msg->GetPayload ()[DATABASE_STORE_TYPE_OFFSET]; // 0- RouterInfo
 	}
 
-	static bool HandleBuildRequestRecords (int num, uint8_t * records, uint8_t * clearText)
+	static bool HandleBuildRequestRecords (std::string host, std::string port, int num, uint8_t * records, uint8_t * clearText)
 	{
+		// 处理隧道请求记录
 		for (int i = 0; i < num; i++)
 		{
+			// 遍历所有请求记录
 			uint8_t * record = records + i*TUNNEL_BUILD_RECORD_SIZE;
+			// 请求是发给本路由器的
 			if (!memcmp (record + BUILD_REQUEST_RECORD_TO_PEER_OFFSET, (const uint8_t *)i2p::context.GetRouterInfo ().GetIdentHash (), 16))
 			{
 				LogPrint (eLogDebug, "I2NP: Build request record ", i, " is ours");
+				// 解密请求记录
 				if (!i2p::context.DecryptTunnelBuildRecord (record + BUILD_REQUEST_RECORD_ENCRYPTED_OFFSET, clearText)) 
 				{
 					LogPrint (eLogWarning, "I2NP: Failed to decrypt tunnel build record");
 					return false;
 				}	
+				// 验证记录合法性
 				if (!memcmp ((const uint8_t *)i2p::context.GetIdentHash (), clearText + ECIES_BUILD_REQUEST_RECORD_NEXT_IDENT_OFFSET, 32) && // if next ident is now ours
 				    !(clearText[ECIES_BUILD_REQUEST_RECORD_FLAG_OFFSET] & TUNNEL_BUILD_RECORD_ENDPOINT_FLAG)) // and not endpoint
 				{
 					LogPrint (eLogWarning, "I2NP: Next ident is ours in tunnel build record");
 					return false;
 				}	
+
+				// 处理隧道构建请求				
 				uint8_t retCode = 0;
 				// replace record to reply
 				if (i2p::context.AcceptsTunnels () && i2p::context.GetCongestionLevel (false) < CONGESTION_LEVEL_FULL)
 				{
+					// 接受隧道并未达到拥塞水平，尝试建立中继隧道
 					auto transitTunnel = i2p::tunnel::CreateTransitTunnel (
+							host, port,
 							bufbe32toh (clearText + ECIES_BUILD_REQUEST_RECORD_RECEIVE_TUNNEL_OFFSET),
 							clearText + ECIES_BUILD_REQUEST_RECORD_NEXT_IDENT_OFFSET,
 							bufbe32toh (clearText + ECIES_BUILD_REQUEST_RECORD_NEXT_TUNNEL_OFFSET),
@@ -407,6 +418,7 @@ namespace i2p
 							clearText + ECIES_BUILD_REQUEST_RECORD_IV_KEY_OFFSET,
 							clearText[ECIES_BUILD_REQUEST_RECORD_FLAG_OFFSET] & TUNNEL_BUILD_RECORD_GATEWAY_FLAG,
 							clearText[ECIES_BUILD_REQUEST_RECORD_FLAG_OFFSET] & TUNNEL_BUILD_RECORD_ENDPOINT_FLAG);
+					// 创建失败
 					if (!i2p::tunnel::tunnels.AddTransitTunnel (transitTunnel))
 						retCode = 30;
 				}
@@ -445,7 +457,7 @@ namespace i2p
 		return false;
 	}
 
-	static void HandleVariableTunnelBuildMsg (uint32_t replyMsgID, uint8_t * buf, size_t len)
+	static void HandleVariableTunnelBuildMsg (std::string host, std::string port, uint32_t replyMsgID, uint8_t * buf, size_t len)
 	{
 		int num = buf[0];
 		LogPrint (eLogDebug, "I2NP: VariableTunnelBuild ", num, " records");
@@ -460,16 +472,21 @@ namespace i2p
 			return;
 		}
 
-		auto tunnel = i2p::tunnel::tunnels.GetPendingInboundTunnel (replyMsgID);
+		auto tunnel = i2p::tunnel::tunnels.GetPendingInboundTunnel (replyMsgID);		// 从待建隧道中，通过MsgID把这个隧道揪出来
+
 		if (tunnel)
 		{
+			// LogToFile("在VariableTunnelBuild，隧道id：" + std::to_string(tunnel->GetTunnelID()));
+			// LogToFile("在VariableTunnelBuild，下一跳的隧道id：" + std::to_string(tunnel->GetNextTunnelID()));
+			// LogToFile("在VariableTunnelBuild，隧道的跳数：" + std::to_string(tunnel->GetNumHops()));
+			// LogToFile("在VariableTunnelBuild，下一跳的hash：" + tunnel->GetNextIdentHash().ToBase64());
 			// endpoint of inbound tunnel
 			LogPrint (eLogDebug, "I2NP: VariableTunnelBuild reply for tunnel ", tunnel->GetTunnelID ());
-			if (tunnel->HandleTunnelBuildResponse (buf, len))
+			if (tunnel->HandleTunnelBuildResponse (buf, len, "in"))		// 构建成隧道
 			{
 				LogPrint (eLogInfo, "I2NP: Inbound tunnel ", tunnel->GetTunnelID (), " has been created");
 				tunnel->SetState (i2p::tunnel::eTunnelStateEstablished);
-				i2p::tunnel::tunnels.AddInboundTunnel (tunnel);
+				i2p::tunnel::tunnels.AddInboundTunnel (tunnel);		// 在所有的隧道里面插入一个InboundTunnel
 			}
 			else
 			{
@@ -479,8 +496,9 @@ namespace i2p
 		}
 		else
 		{
+			// 如果这个msg之前没有在我的池里面出现过，说明就是别人给我发的，我要成为中继节点
 			uint8_t clearText[ECIES_BUILD_REQUEST_RECORD_CLEAR_TEXT_SIZE];
-			if (HandleBuildRequestRecords (num, buf + 1, clearText))
+			if (HandleBuildRequestRecords (host, port, num, buf + 1, clearText))
 			{
 				if (clearText[ECIES_BUILD_REQUEST_RECORD_FLAG_OFFSET] & TUNNEL_BUILD_RECORD_ENDPOINT_FLAG) // we are endpoint of outboud tunnel
 				{
@@ -522,8 +540,12 @@ namespace i2p
 		auto tunnel = i2p::tunnel::tunnels.GetPendingOutboundTunnel (replyMsgID);
 		if (tunnel)
 		{
+			// LogToFile("在TunnelBuildReply，隧道id：" + std::to_string(tunnel->GetTunnelID()));
+			// LogToFile("在TunnelBuildReply，下一跳的隧道id：" + std::to_string(tunnel->GetNextTunnelID()));
+			// LogToFile("在TunnelBuildReply，隧道的跳数：" + std::to_string(tunnel->GetNumHops()));
+			// LogToFile("在TunnelBuildReply，下一跳的hash：" + tunnel->GetNextIdentHash().ToBase64());
 			// reply for outbound tunnel
-			if (tunnel->HandleTunnelBuildResponse (buf, len))
+			if (tunnel->HandleTunnelBuildResponse (buf, len, "out"))
 			{
 				LogPrint (eLogInfo, "I2NP: Outbound tunnel ", tunnel->GetTunnelID (), " has been created");
 				tunnel->SetState (i2p::tunnel::eTunnelStateEstablished);
@@ -539,26 +561,34 @@ namespace i2p
 			LogPrint (eLogWarning, "I2NP: Pending tunnel for message ", replyMsgID, " not found");
 	}
 
-	static void HandleShortTunnelBuildMsg (uint32_t replyMsgID, uint8_t * buf, size_t len)
+	static void HandleShortTunnelBuildMsg (std::string host, std::string port, uint32_t replyMsgID, uint8_t * buf, size_t len)
 	{
-		int num = buf[0];
+		int num = buf[0];		// 表明这个shortTunnelbuild有num个tunnel
+
 		LogPrint (eLogDebug, "I2NP: ShortTunnelBuild ", num, " records");
+		// 检查记录数量是否超过允许的最大数量，超出则输出错误并返回
 		if (num > i2p::tunnel::MAX_NUM_RECORDS)
 		{
 			LogPrint (eLogError, "I2NP: Too many records in ShortTunnelBuild message ", num);
 			return;
 		}
+
+		// 检查消息长度是否足够容纳所有记录，如果消息过短，输出错误并返回
 		if (len < num*SHORT_TUNNEL_BUILD_RECORD_SIZE + 1)
 		{
 			LogPrint (eLogError, "I2NP: ShortTunnelBuild message of ", num, " records is too short ", len);
 			return;
 		}
+
+		// 尝试根据 replyMsgID 查找一个等待的入站隧道，如果找到，继续处理
+		// 找到说明这个隧道是我自己创立的
 		auto tunnel = i2p::tunnel::tunnels.GetPendingInboundTunnel (replyMsgID);
 		if (tunnel)
 		{
+			// 我自己创立的隧道，我作为endpoint或者gateway
 			// endpoint of inbound tunnel
 			LogPrint (eLogDebug, "I2NP: ShortTunnelBuild reply for tunnel ", tunnel->GetTunnelID ());
-			if (tunnel->HandleTunnelBuildResponse (buf, len))
+			if (tunnel->HandleTunnelBuildResponse (buf, len, "in"))
 			{
 				LogPrint (eLogInfo, "I2NP: Inbound tunnel ", tunnel->GetTunnelID (), " has been created");
 				tunnel->SetState (i2p::tunnel::eTunnelStateEstablished);
@@ -571,38 +601,53 @@ namespace i2p
 			}
 			return;
 		}
+
+		// 这个隧道不是我创立的，开始逐步处理每个隧道记录
 		const uint8_t * record = buf + 1;
 		for (int i = 0; i < num; i++)
 		{
+			// 检查记录中的身份散列（IdentHash）是否匹配本地路由器，如果匹配则是自己的记录，说明创建者就是来找我创建隧道的，如果不是就处理下一个记录
+			// （这些不同的记录有什么关系呢） 
 			if (!memcmp (record, (const uint8_t *)i2p::context.GetRouterInfo ().GetIdentHash (), 16))
 			{
 				LogPrint (eLogDebug, "I2NP: Short request record ", i, " is ours");
 				uint8_t clearText[SHORT_REQUEST_RECORD_CLEAR_TEXT_SIZE];
+				// 解密记录中的请求，如果解密失败就返回
 				if (!i2p::context.DecryptTunnelShortRequestRecord (record + SHORT_REQUEST_RECORD_ENCRYPTED_OFFSET, clearText))
 				{
 					LogPrint (eLogWarning, "I2NP: Can't decrypt short request record ", i);
 					return;
 				}
+
+				// 检查加密层的类型，如果不是 AES，输出警告并返回
 				if (clearText[SHORT_REQUEST_RECORD_LAYER_ENCRYPTION_TYPE]) // not AES
 				{
 					LogPrint (eLogWarning, "I2NP: Unknown layer encryption type ", clearText[SHORT_REQUEST_RECORD_LAYER_ENCRYPTION_TYPE], " in short request record");
 					return;
 				}
+
+				// 获取当前的 Noise 状态，用于后续的密钥生成
 				auto& noiseState = i2p::context.GetCurrentNoiseState ();
+
+				// 生成回复密钥 (AEAD/Chacha20/Poly1305) 和层密钥 (AES)
 				uint8_t replyKey[32]; // AEAD/Chacha20/Poly1305
 				i2p::crypto::AESKey layerKey, ivKey; // AES
 				i2p::crypto::HKDF (noiseState.m_CK, nullptr, 0, "SMTunnelReplyKey", noiseState.m_CK);
 				memcpy (replyKey, noiseState.m_CK + 32, 32);
 				i2p::crypto::HKDF (noiseState.m_CK, nullptr, 0, "SMTunnelLayerKey", noiseState.m_CK);
 				memcpy (layerKey, noiseState.m_CK + 32, 32);
-				bool isEndpoint = clearText[SHORT_REQUEST_RECORD_FLAG_OFFSET] & TUNNEL_BUILD_RECORD_ENDPOINT_FLAG;
+
+				// 检查该记录是否是终端节点
+				bool isEndpoint = clearText[SHORT_REQUEST_RECORD_FLAG_OFFSET] & TUNNEL_BUILD_RECORD_ENDPOINT_FLAG;	// TUNNEL_BUILD_RECORD_ENDPOINT_FLAG = 64U
 				if (isEndpoint)
 				{
+					// 如果是终端节点，生成初始化向量密钥（IV Key）
 					i2p::crypto::HKDF (noiseState.m_CK, nullptr, 0, "TunnelLayerIVKey", noiseState.m_CK);
 					memcpy (ivKey, noiseState.m_CK + 32, 32);
 				}
 				else
 				{	
+					// 如果不是终端节点，检查下一跳的身份是否与当前节点匹配，如果匹配，输出警告并返回（不能自己发给自己）
 					if (!memcmp ((const uint8_t *)i2p::context.GetIdentHash (), clearText + SHORT_REQUEST_RECORD_NEXT_IDENT_OFFSET, 32)) // if next ident is now ours
 					{
 						LogPrint (eLogWarning, "I2NP: Next ident is ours in short request record");
@@ -615,11 +660,13 @@ namespace i2p
 				std::shared_ptr<i2p::tunnel::TransitTunnel> transitTunnel;
 				uint8_t retCode = 0;
 				if (!i2p::context.AcceptsTunnels () || i2p::context.GetCongestionLevel (false) >= CONGESTION_LEVEL_FULL)
-					retCode = 30;
+					retCode = 30;	// 拒绝隧道
 				if (!retCode)
 				{
 					// create new transit tunnel
+					// 主要是走这边
 					transitTunnel = i2p::tunnel::CreateTransitTunnel (
+						host, port,
 						bufbe32toh (clearText + SHORT_REQUEST_RECORD_RECEIVE_TUNNEL_OFFSET),
 						clearText + SHORT_REQUEST_RECORD_NEXT_IDENT_OFFSET,
 						bufbe32toh (clearText + SHORT_REQUEST_RECORD_NEXT_TUNNEL_OFFSET),
@@ -630,15 +677,16 @@ namespace i2p
 						retCode = 30;
 				}
 
-				// encrypt reply
-				uint8_t nonce[12];
+				// 加密回复消息
+				uint8_t nonce[12];		// 用于 AEAD 加密的 nonce
 				memset (nonce, 0, 12);
 				uint8_t * reply = buf + 1;
 				for (int j = 0; j < num; j++)
 				{
-					nonce[4] = j; // nonce is record #
+					nonce[4] = j; // nonce 的第 4 字节是记录的索引
 					if (j == i)
 					{
+						// 对自己的记录进行加密并返回结果
 						memset (reply + SHORT_RESPONSE_RECORD_OPTIONS_OFFSET, 0, 2); // no options
 						reply[SHORT_RESPONSE_RECORD_RET_OFFSET] = retCode;
 						if (!i2p::crypto::AEADChaCha20Poly1305 (reply, SHORT_TUNNEL_BUILD_RECORD_SIZE - 16,
@@ -649,45 +697,68 @@ namespace i2p
 						}
 					}
 					else
+						// 如果不是当前记录，对其进行 ChaCha20 加密
 						i2p::crypto::ChaCha20 (reply, SHORT_TUNNEL_BUILD_RECORD_SIZE, replyKey, nonce, reply);
-					reply += SHORT_TUNNEL_BUILD_RECORD_SIZE;
+					reply += SHORT_TUNNEL_BUILD_RECORD_SIZE;		// 处理下一个记录
 				}
+
+				// 定义当消息被丢弃时的处理函数
 				// send reply
 				auto onDrop = [transitTunnel]()
 					{
 						if (transitTunnel)
 						{
+							// 如果隧道超时，将其标记为过期
 							auto t = transitTunnel->GetCreationTime ();
 							if (t > i2p::tunnel::TUNNEL_EXPIRATION_TIMEOUT)
 								// make transit tunnel expired 
 								transitTunnel->SetCreationTime (t - i2p::tunnel::TUNNEL_EXPIRATION_TIMEOUT);
 						}	
 					};
+
+				// 如果当前是终端节点，那么回复消息，否则将消息转发给下一个结点
 				if (isEndpoint)
 				{
+					// 创建一个新的I2NP短消息
 					auto replyMsg = NewI2NPShortMessage ();
+
+					// 将接收到的数据添加到消息中
 					replyMsg->Concat (buf, len);
+
+					// 填充I2NP消息头，设置消息类型为短隧道构建回复，并将消息ID设置为从`clearText`解析出来的值
 					replyMsg->FillI2NPMessageHeader (eI2NPShortTunnelBuildReply, bufbe32toh (clearText + SHORT_REQUEST_RECORD_SEND_MSG_ID_OFFSET));
-					if (transitTunnel) replyMsg->onDrop = onDrop;
+					if (transitTunnel) replyMsg->onDrop = onDrop;		// 我们同意这个隧道
+
+					// 检查收到的下一跳的身份哈希是否与本地节点的身份哈希匹配，即回复的入站网关是否是本地节点
+					// 这时候应该把信息发送给创建者的一个入站隧道的网关
 					if (memcmp ((const uint8_t *)i2p::context.GetIdentHash (),
 						clearText + SHORT_REQUEST_RECORD_NEXT_IDENT_OFFSET, 32)) // reply IBGW is not local?
 					{
+						// 入站隧道网关不是我们
 						i2p::crypto::HKDF (noiseState.m_CK, nullptr, 0, "RGarlicKeyAndTag", noiseState.m_CK);
 						uint64_t tag;
 						memcpy (&tag, noiseState.m_CK, 8);
 						// we send it to reply tunnel
+
+						// 将回复消息发送到下一个隧道，通过封装后的ECIES加密发送
 						transports.SendMessage (clearText + SHORT_REQUEST_RECORD_NEXT_IDENT_OFFSET,
 						CreateTunnelGatewayMsg (bufbe32toh (clearText + SHORT_REQUEST_RECORD_NEXT_TUNNEL_OFFSET),
 							i2p::garlic::WrapECIESX25519Message (replyMsg, noiseState.m_CK + 32, tag)));
 					}
 					else
 					{
+						 // 如果回复的入站网关是本地节点
 						// IBGW is local
 						uint32_t tunnelID = bufbe32toh (clearText + SHORT_REQUEST_RECORD_NEXT_TUNNEL_OFFSET);
+
+						// 从隧道管理器中查找对应的隧道
 						auto tunnel = i2p::tunnel::tunnels.GetTunnel (tunnelID);
 						if (tunnel)
 						{	
+							// 发送回复消息到隧道
 							tunnel->SendTunnelDataMsg (replyMsg);
+
+							// 刷新隧道数据消息队列
 							tunnel->FlushTunnelDataMsgs ();
 						}	
 						else
@@ -701,8 +772,10 @@ namespace i2p
 					if (transitTunnel) msg->onDrop = onDrop;
 					transports.SendMessage (clearText + SHORT_REQUEST_RECORD_NEXT_IDENT_OFFSET, msg);
 				}	
-				return;
+				return;		// 处理完自己的记录后退出循环，也就是不管其他记录了
 			}
+
+			// 处理下一个记录
 			record += SHORT_TUNNEL_BUILD_RECORD_SIZE;
 		}
 	}
@@ -806,6 +879,8 @@ namespace i2p
 	{
 		if (msg)
 		{
+			std::string host = msg->GetIP();
+			std::string port = msg->GetPort();
 			uint8_t typeID = msg->GetTypeID();
 			uint32_t msgID = msg->GetMsgID();
 			LogPrint (eLogDebug, "I2NP: Handling tunnel build message with len=", msg->GetLength(),", type=", (int)typeID, ", msgID=", (unsigned int)msgID);
@@ -814,21 +889,28 @@ namespace i2p
 			switch (typeID)
 			{
 				case eI2NPVariableTunnelBuild:
-					HandleVariableTunnelBuildMsg (msgID, payload, size);
+					// LogToFile("收到VariableTunnelBuild消息");		// 入站隧道，有可能中继路由
+					HandleVariableTunnelBuildMsg (host, port, msgID, payload, size);
 					break;
 				case eI2NPShortTunnelBuild:
-					HandleShortTunnelBuildMsg (msgID, payload, size);
+					// LogToFile("收到ShortTunnelBuild消息");		// 入站隧道，有可能中继路由
+					// 这个消息可能创建自己的隧道，也可能创建传输隧道
+					HandleShortTunnelBuildMsg (host, port, msgID, payload, size);
 					break;
 				case eI2NPVariableTunnelBuildReply:
+					// LogToFile("收到VariableTunnelBuildReply消息");		// 出站隧道
 					HandleTunnelBuildReplyMsg (msgID, payload, size, false);
 					break;
 				case eI2NPShortTunnelBuildReply:
+					// LogToFile("收到ShortTunnelBuildReply消息");		// 出站隧道
 					HandleTunnelBuildReplyMsg (msgID, payload, size, true);
 					break;
 				case eI2NPTunnelBuild:
+					// LogToFile("收到I2NPTunnelBuild消息");
 					HandleTunnelBuildMsg (payload, size);
 					break;
 				case eI2NPTunnelBuildReply:
+					// LogToFile("收到I2NPTunnelBuildReply消息");
 					// TODO:
 					break;
 				default:

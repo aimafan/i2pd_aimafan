@@ -1,4 +1,4 @@
-#include "Logger.h"
+#include "Logger_transport.h"
 #include <fstream>
 #include <iostream>
 #include <chrono>
@@ -6,7 +6,7 @@
 #include <sstream>
 
 // 获取当前时间的字符串表示
-std::string GetCurrentTimeString()
+std::string GetCurrentTimeString_tran()
 {
     auto now = std::chrono::system_clock::now();
     auto now_c = std::chrono::system_clock::to_time_t(now);
@@ -16,18 +16,18 @@ std::string GetCurrentTimeString()
 }
 
 // 日志函数的实现
-void LogToFile(const std::string &message)
+void LogToFile_tran(const std::string &message)
 {
-    std::ofstream file("./link_explorer.log", std::ios::app);
+    std::ofstream file("./transport_explorer.log", std::ios::app);
     if (file.is_open())
     {
-        // file << GetCurrentTimeString() << " ; " << message << std::endl;
-        file << message << std::endl;
+        // file << GetCurrentTimeString_tran() << " ; " << message << std::endl;
+        file  << message << std::endl;
         file.close();
     }
     else
     {
         std::cerr << "无法打开日志文件："
-                  << "./link_explorer.log" << std::endl;
+                  << "./transport_explorer.log" << std::endl;
     }
 }

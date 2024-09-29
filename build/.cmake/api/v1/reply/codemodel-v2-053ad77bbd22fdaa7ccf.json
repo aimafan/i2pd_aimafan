@@ -1,0 +1,88 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-60c13adf9c79dbd6ac2c.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.7"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "i2pd",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "i2pd::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-i2pd-Debug-f40c65c0d5160c820962.json",
+					"name" : "i2pd",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "libi2pd::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-libi2pd-Debug-b14b7b712f45f4203abb.json",
+					"name" : "libi2pd",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "libi2pdclient::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-libi2pdclient-Debug-a1ce97841ce386111385.json",
+					"name" : "libi2pdclient",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "libi2pdlang::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-libi2pdlang-Debug-104ca3524a7b9ef0b469.json",
+					"name" : "libi2pdlang",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/root/Documents/i2pd_link_explorer/build",
+		"source" : "/root/Documents/i2pd_link_explorer/build"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}

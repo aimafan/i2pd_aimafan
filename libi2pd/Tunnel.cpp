@@ -24,6 +24,7 @@
 #include "TunnelPool.h"
 #include "util.h"
 #include "ECIESX25519AEADRatchetSession.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -68,6 +69,10 @@ namespace tunnel
 			hop->recordIndex = recordIndicies[i]; i++;
 			hop->CreateBuildRequestRecord (records, msgID);
 			hop = hop->next;
+			// LogToFile("这个hop的tunnel id = " + std::to_string(hop->tunnelID));
+			// LogToFile("这个hop的下一跳的tunnel id = " + std::to_string(hop->nextTunnelID));
+			// LogToFile("这个hop的ident = " + hop->ident->ToBase64());
+			// LogToFile("这个hop的ident = " + hop->nextIdent.ToBase64());
 		}
 		// fill up fake records with random data
 		for (int i = numHops; i < numRecords; i++)
@@ -110,6 +115,7 @@ namespace tunnel
 				}
 			}
 			outboundTunnel->SendTunnelDataMsgTo (GetNextIdentHash (), 0, msg);
+			// LogToFile("顺着出站隧道发送消息，发送消息的目标是：" + GetNextIdentHash().ToBase64());
 		}
 		else
 		{
@@ -124,25 +130,29 @@ namespace tunnel
 				else
 					i2p::context.SubmitECIESx25519Key (key, tag);
 			}
+			// LogToFile("通过i2p传输层发送消息，发送消息的目标是" + GetNextIdentHash().ToBase64());
 			i2p::transport::transports.SendMessage (GetNextIdentHash (), msg);
 		}
 	}
 
-	bool Tunnel::HandleTunnelBuildResponse (uint8_t * msg, size_t len)
+	// 入站隧道和出站隧道都包括
+	bool Tunnel::HandleTunnelBuildResponse (uint8_t * msg, size_t len, std::string state)
 	{
 		LogPrint (eLogDebug, "Tunnel: TunnelBuildResponse ", (int)msg[0], " records.");
 
-		TunnelHopConfig * hop = m_Config->GetLastHop ();
+		TunnelHopConfig * hop = m_Config->GetLastHop ();		// 从最后一个跳点开始
+		 
 		while (hop)
 		{
 			// decrypt current hop
 			if (hop->recordIndex >= 0 && hop->recordIndex < msg[0])
 			{
-				if (!hop->DecryptBuildResponseRecord (msg + 1))
+				if (!hop->DecryptBuildResponseRecord (msg + 1))	// 解密每一个记录
 					return false;
 			}
 			else
 			{
+				// 超出范围就返回false
 				LogPrint (eLogWarning, "Tunnel: Hop index ", hop->recordIndex, " is out of range");
 				return false;
 			}
@@ -173,6 +183,7 @@ namespace tunnel
 				profile->TunnelBuildResponse (ret);
 			if (ret)
 				// if any of participants declined the tunnel is not established
+				// 任何一个hop返回非0值，说明隧道无法建立
 				established = false;
 			hop = hop->next;
 			numHops++;
@@ -181,18 +192,55 @@ namespace tunnel
 		{
 			// create tunnel decryptions from layer and iv keys in reverse order
 			m_Hops.resize (numHops);
+			int flag = 0;
+			std::string ident_hash[6]; 
+			std::string tunnel_id[6]; 
+			std::string ntcp2_ipv4[6]; 
+			std::string ntcp2_port[6]; 
+			for (int i = 0; i < 6; ++i) {
+ 				ident_hash[i] = " ";
+				tunnel_id[i] = " ";
+				ntcp2_ipv4[i] = " ";
+				ntcp2_port[i] = " ";
+			}
+
 			hop = m_Config->GetLastHop ();
 			int i = 0;
+			// 记录这个隧道上每个节点的信息
 			while (hop)
 			{
 				m_Hops[i].ident = hop->ident;
 				m_Hops[i].decryption.SetKeys (hop->layerKey, hop->ivKey);
+				try{
+					auto routerinfo = i2p::data::netdb.FindRouter(hop->ident->GetIdentHash());
+					tunnel_id[i] = std::to_string(hop->tunnelID);
+					ident_hash[i] = hop->ident->GetIdentHash().ToBase64();
+					if(routerinfo){
+						if(routerinfo->GetNTCP2V4Address() ){
+							if( routerinfo->GetNTCP2V4Address()->host.to_string() != "0.0.0.0"){
+								ntcp2_ipv4[i] = routerinfo->GetNTCP2V4Address()->host.to_string();
+								ntcp2_port[i] = std::to_string(routerinfo->GetNTCP2V4Address()->port);
+							}else{
+								ntcp2_ipv4[i] = " ";
+								ntcp2_port[i] = "0";
+							}
+						}
+					}
+				} catch(const std::exception& e){
+					flag = 1;
+				}
 				hop = hop->prev;
 				i++;
 			}
 			m_IsShortBuildMessage = m_Config->IsShort ();
 			m_FarEndTransports = m_Config->GetFarEndTransports ();
 			m_Config = nullptr;
+			i --;
+			if(flag == 0){
+				int num = 1;
+				// in/out , 结点1hash , 结点1, tunnel_id, 结点1的ip , 节点1的port
+				LogToFile(state + " , " + ident_hash[0] + " , " + tunnel_id[0] + " , " + ntcp2_ipv4[0] + " , " + ntcp2_port[0] + " , " + ident_hash[1] + " , " + tunnel_id[1] + " , " + ntcp2_ipv4[1] + " , " + ntcp2_port[1] + " , " + ident_hash[2] + " , " + tunnel_id[2] + " , " + ntcp2_ipv4[2] + " , " + ntcp2_port[2]);
+			}
 		}
 		if (established) m_State = eTunnelStateEstablished;
 		return established;
@@ -358,6 +406,7 @@ namespace tunnel
 
 	std::shared_ptr<InboundTunnel> Tunnels::GetPendingInboundTunnel (uint32_t replyMsgID)
 	{
+		// replyMsgID：用来查找隧道的消息ID
 		return GetPendingTunnel (replyMsgID, m_PendingInboundTunnels);
 	}
 
@@ -369,11 +418,12 @@ namespace tunnel
 	template<class TTunnel>
 	std::shared_ptr<TTunnel> Tunnels::GetPendingTunnel (uint32_t replyMsgID, const std::map<uint32_t, std::shared_ptr<TTunnel> >& pendingTunnels)
 	{
-		auto it = pendingTunnels.find(replyMsgID);
+		auto it = pendingTunnels.find(replyMsgID);		// 通过replyMsgID找到对应的pendingTunnel
 		if (it != pendingTunnels.end () && it->second->GetState () == eTunnelStatePending)
 		{
-			it->second->SetState (eTunnelStateBuildReplyReceived);
-			return it->second;
+			// 找到了隧道，并且隧道的状态是待建
+			it->second->SetState (eTunnelStateBuildReplyReceived);		// 更新隧道状态，表示收到回复了，这时候还是不能从待建隧道中移除
+			return it->second;			// 返回隧道
 		}
 		return nullptr;
 	}
@@ -481,12 +531,15 @@ namespace tunnel
 		{
 			try
 			{
+				// 从队列中以1秒的超时获取下一条消息
 				auto msg = m_Queue.GetNextWithTimeout (1000); // 1 sec
 				if (msg)
 				{
+					// 初始化变量，用于处理消息和隧道
 					int numMsgs = 0;
 					uint32_t prevTunnelID = 0, tunnelID = 0;
 					std::shared_ptr<TunnelBase> prevTunnel;
+					// 循环处理批量的隧道消息，直到获取不到更多消息为止
 					do
 					{
 						std::shared_ptr<TunnelBase> tunnel;
@@ -620,19 +673,23 @@ namespace tunnel
 		ManagePendingTunnels (m_PendingOutboundTunnels, ts);
 	}
 
+	// 末班参数，表示待建隧道的容器类型
 	template<class PendingTunnels>
 	void Tunnels::ManagePendingTunnels (PendingTunnels& pendingTunnels, uint64_t ts)
 	{
 		// check pending tunnel. delete failed or timeout
+		// 遍历待建隧道，删掉超时的
 		for (auto it = pendingTunnels.begin (); it != pendingTunnels.end ();)
 		{
 			auto tunnel = it->second;
+			// 隧道的状态
 			switch (tunnel->GetState ())
 			{
-				case eTunnelStatePending:
+				case eTunnelStatePending:	// 待建
 					if (ts > tunnel->GetCreationTime () + TUNNEL_CREATION_TIMEOUT ||
 					    ts + TUNNEL_CREATION_TIMEOUT < tunnel->GetCreationTime ())
 					{
+						// 超时删除
 						LogPrint (eLogDebug, "Tunnel: Pending build request ", it->first, " timeout, deleted");
 						// update stats
 						auto config = tunnel->GetTunnelConfig ();
@@ -657,19 +714,20 @@ namespace tunnel
 					else
 						++it;
 				break;
-				case eTunnelStateBuildFailed:
+				case eTunnelStateBuildFailed:	// 隧道构建失败，删除
 					LogPrint (eLogDebug, "Tunnel: Pending build request ", it->first, " failed, deleted");
 					it = pendingTunnels.erase (it);
 					FailedTunnelCreation();
 				break;
-				case eTunnelStateBuildReplyReceived:
+				case eTunnelStateBuildReplyReceived:		// 收到隧道构建回复，但是无法确定是成功还是失败
 					// intermediate state, will be either established of build failed
 					++it;
 				break;
 				default:
 					// success
+					// 删除成功的隧道
 					it = pendingTunnels.erase (it);
-					SuccesiveTunnelCreation();
+					SuccesiveTunnelCreation();		// 只是做统计，统计成功率
 			}
 		}
 	}

@@ -102,7 +102,7 @@ namespace tunnel
 			std::shared_ptr<TunnelPool> GetTunnelPool () const { return m_Pool; };
 			void SetTunnelPool (std::shared_ptr<TunnelPool> pool) { m_Pool = pool; };
 
-			bool HandleTunnelBuildResponse (uint8_t * msg, size_t len);
+			bool HandleTunnelBuildResponse (uint8_t * msg, size_t len, std::string state);
 
 			// implements TunnelBase
 			void SendTunnelDataMsg (std::shared_ptr<i2p::I2NPMessage> msg) override;
@@ -268,12 +268,15 @@ namespace tunnel
 			std::shared_ptr<ZeroHopsOutboundTunnel> CreateZeroHopsOutboundTunnel (std::shared_ptr<TunnelPool> pool);
 
 			// Calculating of tunnel creation success rate
+			// 计算隧道创建的成功率
 			void SuccesiveTunnelCreation()
 			{
 				// total TCSR
+				// 总次数
 				m_TotalNumSuccesiveTunnelCreations++;
 				// A modified version of the EWMA algorithm, where alpha is increased at the beginning to accelerate similarity
 				double alpha = TCSR_SMOOTHING_CONSTANT + (1 - TCSR_SMOOTHING_CONSTANT)/++m_TunnelCreationAttemptsNum;
+				// 更新创建成功率
 				m_TunnelCreationSuccessRate = alpha * 1 + (1 - alpha) * m_TunnelCreationSuccessRate;
 
 			}

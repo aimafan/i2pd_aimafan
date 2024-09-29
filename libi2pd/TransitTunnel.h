@@ -104,7 +104,7 @@ namespace tunnel
 			TunnelEndpoint m_Endpoint;
 	};
 
-	std::shared_ptr<TransitTunnel> CreateTransitTunnel (uint32_t receiveTunnelID,
+	std::shared_ptr<TransitTunnel> CreateTransitTunnel (std::string host, std::string port, uint32_t receiveTunnelID,
 		const i2p::data::IdentHash& nextIdent, uint32_t nextTunnelID,
 		const i2p::crypto::AESKey& layerKey, const i2p::crypto::AESKey& ivKey,
 		bool isGateway, bool isEndpoint);

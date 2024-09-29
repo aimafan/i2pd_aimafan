@@ -23,6 +23,7 @@
 #include "util.h"
 #include "Socks5.h"
 #include "NTCP2.h"
+#include "Logger_transport.h"
 
 #if defined(__linux__) && !defined(_NETINET_IN_H)
 	#include <linux/in6.h>
@@ -901,6 +902,8 @@ namespace transport
 
 	void NTCP2Session::ProcessNextFrame (const uint8_t * frame, size_t len)
 	{
+		std::string host = m_RemoteEndpoint.address().to_string();
+		std::string port = std::to_string(m_RemoteEndpoint.port());
 		size_t offset = 0;
 		while (offset < len)
 		{
@@ -940,20 +943,37 @@ namespace transport
 					i2p::data::netdb.PostI2NPMsg (CreateI2NPMessage (eI2NPDummyMsg, frame + offset, size));
 					break;
 				}
+				// 处理 NTCP2 数据块中的 I2NP 消息
 				case eNTCP2BlkI2NPMessage:
 				{
 					LogPrint (eLogDebug, "NTCP2: I2NP");
-					if (size > I2NP_MAX_MESSAGE_SIZE)
+					// 检查消息大小是否超过 I2NP 最大消息尺寸
+					if (size > I2NP_MAX_MESSAGE_SIZE)	// 62708
 					{
 						LogPrint (eLogError, "NTCP2: I2NP block is too long ", size);
 						break;
 					}
+
+					// 根据消息类型创建新的 I2NP 消息对象
+					// 如果 frame[offset] 表示的是隧道数据消息，则创建一个新的隧道消息对象
+					// 否则创建一个普通的 I2NP 消息对象，大小为 size
+					// 对于创建隧道来说，一般不是隧道消息
+					// 最终返回了I2NP消息类型
 					auto nextMsg = (frame[offset] == eI2NPTunnelData) ? NewI2NPTunnelMessage (true) : NewI2NPMessage (size);
+					// 计算消息的总长度，包括 offset、size 以及 7 个字节的 I2NP 完整头部
 					nextMsg->len = nextMsg->offset + size + 7; // 7 more bytes for full I2NP header
 					if (nextMsg->len <= nextMsg->maxLen)
 					{
+						// 将 NTCP2 消息的内容复制到新创建的 I2NP 消息头部
 						memcpy (nextMsg->GetNTCP2Header (), frame + offset, size);
+						// 从 NTCP2 格式转换为 I2NP 格式
 						nextMsg->FromNTCP2 ();
+						if(!host.empty()){
+							if(!port.empty()){
+								nextMsg->SetIPandPort(host, port);
+							}
+						}
+						// 将新消息添加到消息处理队列中，供后续处理
 						m_Handler.PutNextMessage (std::move (nextMsg));
 					}
 					else
@@ -1251,6 +1271,7 @@ namespace transport
 		m_Server.GetService ().post (std::bind (&NTCP2Session::PostI2NPMessages, shared_from_this (), msgs));
 	}
 
+	// 该函数将 I2NP 消息发送到 NTCP2 会话的发送队列，关于发送的代码
 	void NTCP2Session::PostI2NPMessages (std::vector<std::shared_ptr<I2NPMessage> > msgs)
 	{
 		if (m_IsTerminated) return;

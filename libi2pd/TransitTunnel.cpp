@@ -14,6 +14,8 @@
 #include "Tunnel.h"
 #include "Transports.h"
 #include "TransitTunnel.h"
+#include "Logger_transport.h"
+#include "NetDb.hpp"
 
 namespace i2p
 {
@@ -98,11 +100,69 @@ namespace tunnel
 		m_Endpoint.HandleDecryptedTunnelDataMsg (newMsg);
 	}
 
-	std::shared_ptr<TransitTunnel> CreateTransitTunnel (uint32_t receiveTunnelID,
+	// 创建中继节点
+	std::shared_ptr<TransitTunnel> CreateTransitTunnel (std::string host, std::string port, uint32_t receiveTunnelID,
 		const i2p::data::IdentHash& nextIdent, uint32_t nextTunnelID,
 		const i2p::crypto::AESKey& layerKey, const i2p::crypto::AESKey& ivKey,
 		bool isGateway, bool isEndpoint)
 	{
+		std::string ntcp2_ipv4, ntcp2_port;
+		auto routerinfo = i2p::data::netdb.FindRouter(nextIdent);
+		std::string ident_hash = nextIdent.ToBase64();
+		if(routerinfo){
+			if(routerinfo->GetNTCP2V4Address() ){
+				if( routerinfo->GetNTCP2V4Address()->host.to_string() != "0.0.0.0"){
+					ntcp2_ipv4 = routerinfo->GetNTCP2V4Address()->host.to_string();
+					ntcp2_port = std::to_string(routerinfo->GetNTCP2V4Address()->port);
+				}else{
+					ntcp2_ipv4 = " ";
+					ntcp2_port = "0";
+				}
+			}
+		}else{
+			ntcp2_ipv4 = " ";
+			ntcp2_port = "0";
+		}
+		// 日志结构：身份, 上一跳节点IP, 上一跳节点Port, 下一跳节点ident, 下一跳节点tunnel id, 下一跳节点ip, 下一跳节点port
+		std::string weizhi;
+		std::string p_ip;
+		std::string p_port;
+		std::string n_ip;
+		std::string n_port;
+		std::string n_ident;
+		std::string n_tunnel_id;
+		if (isGateway){
+			weizhi = "gateway";
+			p_ip = host;
+			p_port = port;
+			n_ip = ntcp2_ipv4;
+			n_port = ntcp2_port;
+			n_ident = nextIdent.ToBase64();
+			n_tunnel_id = std::to_string(nextTunnelID);
+		}
+		else if (isEndpoint){
+			weizhi = "endpoint";
+			p_ip = host;
+			p_port = port;
+			n_ip = " ";
+			n_port = " ";
+			n_ident = " ";
+			n_tunnel_id = " ";
+		}
+		else {
+			weizhi = "participant";
+			p_ip = host;
+			p_port = port;
+			n_ip = ntcp2_ipv4;
+			n_port = ntcp2_port;
+			n_ident = nextIdent.ToBase64();
+			n_tunnel_id = std::to_string(nextTunnelID);
+		}
+		LogToFile_tran(weizhi + " , " + p_ip + " , " + p_port + " , " + n_ip + " , " + n_port + " , " + n_ident + " , " + n_tunnel_id);
+
+		// 如果是endpoint，那么nexttunnelid和nexttunnelhash应该都是创建者的某个入站隧道网关的信息
+
+
 		if (isEndpoint)
 		{
 			LogPrint (eLogDebug, "TransitTunnel: endpoint ", receiveTunnelID, " created");

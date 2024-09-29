@@ -1,0 +1,21 @@
+在境外服务器上执行i2pd可执行文件，会自动构建i2p结点，并使用其他i2p服务器创建隧道或成为其他i2p服务器创建隧道的一部分。执行i2pd可执行文件一段时间后，会生成两个日志文件link_explorer.log和transport_explorer.log，其中前者为该节点使用其他i2p服务器创建隧道的信息，后者为其他i2p服务器使用该节点创建隧道的信息。
+
+link_explorer.log文件：
+每一行表示一条隧道，每一行的结构如下：
+隧道类型（in入站隧道/out出站隧道） , 节点1的身份哈希 , 节点1的隧道id , 节点1的ip地址 , 节点1的端口号 , 节点2的身份哈希 , 节点2的隧道id , 节点2的ip地址 , 节点2的端口号 , 节点3的身份哈希 , 节点3的隧道id , 节点3的ip地址 , 节点3的端口号
+
+例：
+in , rD3PYYqrlVVKm9-kdCon6NGJlusGla0ALNb04f1Zi3w= , 318124733 , 46.142.174.42 , 27692 , 1raAFupalt1-5x8W9gXdcXlxBiM35C8ff1wMYFrDVqw= , 76060127 , 51.15.66.77 , 25849 , tXuneoZNBl-QZ3O0ceo4b8vsEGiUrplEdELmb0Ou8RU= , 3308954757 , 46.249.38.35 , 21000
+
+transport_explorer.log文件：
+每一行表示一条隧道，每一行的结构如下：
+节点身份, 上一跳节点IP , 上一跳节点Port , 下一跳节点身份哈希 , 下一跳节点隧道id, 下一跳节点ip, 下一跳节点port
+
+注意，统共有三种身份，分别是gateway，participant和endpoint，当该节点是gateway身份时，没有上一跳节点，当该节点是endpoint身份时，没有下一跳节点
+
+例：
+gateway ,  ,  , 69.130.251.224 , 12321 , 4piaLciKPuZUHMsBT0NE8oz1L5g8jsd8oLumgXVAv50= , 1940016146
+
+participant , 1.174.229.234 , 4988 , 144.6.107.60 , 23154 , TEzbz04~MSHUyRG9iiBzBONyX0WqfxxdlzXiwpUd4t4= , 1450547601
+
+endpoint , 51.83.132.16 , 34622 ,   ,   ,   ,  
