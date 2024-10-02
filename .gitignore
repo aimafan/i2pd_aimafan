@@ -57,7 +57,7 @@ local.properties
 
 # PDT-specific
 .buildpath
-
+build/i2pd_link_log
 
 #################
 ## Visual Studio

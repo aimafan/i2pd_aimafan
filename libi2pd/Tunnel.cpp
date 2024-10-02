@@ -25,6 +25,7 @@
 #include "util.h"
 #include "ECIESX25519AEADRatchetSession.h"
 #include "Logger.h"
+#include "Logger_transport.h"
 
 namespace i2p
 {
@@ -236,10 +237,40 @@ namespace tunnel
 			m_FarEndTransports = m_Config->GetFarEndTransports ();
 			m_Config = nullptr;
 			i --;
+			std::string weizhi;
+			std::string p_ip;
+			std::string p_port;
+			std::string n_ip;
+			std::string n_port;
+			std::string n_ident;
+			std::string n_tunnel_id;
+			std::string p_ident;
+			std::string	p_tunnel_id;
 			if(flag == 0){
 				int num = 1;
-				// in/out , 结点1hash , 结点1, tunnel_id, 结点1的ip , 节点1的port
-				LogToFile(state + " , " + ident_hash[0] + " , " + tunnel_id[0] + " , " + ntcp2_ipv4[0] + " , " + ntcp2_port[0] + " , " + ident_hash[1] + " , " + tunnel_id[1] + " , " + ntcp2_ipv4[1] + " , " + ntcp2_port[1] + " , " + ident_hash[2] + " , " + tunnel_id[2] + " , " + ntcp2_ipv4[2] + " , " + ntcp2_port[2]);
+				// in的话就是第一个节点，out的话就是最后一个节点
+				if(state == "in"){
+					weizhi = "endpoint(creator)";
+					p_ident = ident_hash[0];
+					p_tunnel_id = tunnel_id[0];
+					p_ip = ntcp2_ipv4[0];
+					p_port = ntcp2_port[0];
+					n_ip = " ";
+					n_port = " ";
+					n_ident = " ";
+					n_tunnel_id = " ";
+				}else{
+					weizhi = "gateway(creator)";
+					p_ident = " ";
+					p_tunnel_id = " ";
+					p_ip = " ";
+					p_port = " ";
+					n_ip = ntcp2_ipv4[i];
+					n_port = ntcp2_port[i];
+					n_ident = ident_hash[i];
+					n_tunnel_id = tunnel_id[i];
+				}
+				LogToFile_tran(weizhi + " , "  +  p_ip + " , " + p_port + " , " + p_ident + " , " + p_tunnel_id  + " , " + n_ip + " , " + n_port + " , " + n_ident + " , " + n_tunnel_id);
 			}
 		}
 		if (established) m_State = eTunnelStateEstablished;
