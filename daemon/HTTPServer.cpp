@@ -31,6 +31,7 @@
 #include "util.h"
 #include "ECIESX25519AEADRatchetSession.h"
 #include "I18N.h"
+#include "Logger.h"
 
 #ifdef WIN32_APP
 #include "Win32App.h"

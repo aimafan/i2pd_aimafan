@@ -24,6 +24,7 @@
 #include "TunnelPool.h"
 #include "util.h"
 #include "ECIESX25519AEADRatchetSession.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -41,56 +42,90 @@ namespace tunnel
 	{
 	}
 
+	// 在i2p网络中构建一个新的隧道，并向下一个节点发送隧道构建请求消息
 	void Tunnel::Build (uint32_t replyMsgID, std::shared_ptr<OutboundTunnel> outboundTunnel)
 	{
+		// 在这个函数之前，应该就已经确定好了他要和谁连接
+		// 获得隧道跳数
 		auto numHops = m_Config->GetNumHops ();
+
+		// 确定记录数量：若跳数 <= 标准记录数，使用标准记录数，否则使用最大记录数
 		const int numRecords = numHops <= STANDARD_NUM_RECORDS ? STANDARD_NUM_RECORDS : MAX_NUM_RECORDS;
+
+		// 根据记录数决定消息类型：若记录数 <= 标准记录数，创建短I2NP消息，否则创建标准I2NP消息
 		auto msg = numRecords <= STANDARD_NUM_RECORDS ? NewI2NPShortMessage () : NewI2NPMessage ();
+
+		// 设置消息的第一个字节为记录数
 		*msg->GetPayload () = numRecords;
+
+		 // 根据隧道配置决定记录大小：short tunnel build还是tunnel build
 		const size_t recordSize = m_Config->IsShort () ? SHORT_TUNNEL_BUILD_RECORD_SIZE : TUNNEL_BUILD_RECORD_SIZE;
+
+		// 调整消息的长度以容纳所有记录（加1是因为第一个字节用于存放记录数）
 		msg->len += numRecords*recordSize + 1;
-		// shuffle records
+
+		// 把0~numrecords-1顺序的存到recordIndicies这个vector中
 		std::vector<int> recordIndicies;
 		for (int i = 0; i < numRecords; i++) recordIndicies.push_back(i);
+
+		// 使用shuffle对recordIndicies这个vector进行随机排列
 		std::shuffle (recordIndicies.begin(), recordIndicies.end(), m_Pool ? m_Pool->GetRng () : std::mt19937(std::random_device()()));
 
-		// create real records
+		// 获取消息载荷的起始地址，跳过第一个字节（记录数）
 		uint8_t * records = msg->GetPayload () + 1;
+
+		// 获取第一个跳节点
 		TunnelHopConfig * hop = m_Config->GetFirstHop ();
 		int i = 0;
+
+		// 为每个真实跳节点创建构建请求记录
 		while (hop)
 		{
 			uint32_t msgID;
-			if (hop->next) // we set replyMsgID for last hop only
+			if (hop->next) // 如果不是最后一个跳节点，生成随机的消息ID
 				RAND_bytes ((uint8_t *)&msgID, 4);
-			else
+			else	// 如果是最后一个跳节点，使用传入的replyMsgID
 				msgID = replyMsgID;
+
+			// 将当前跳的记录索引设置为随机打乱后的索引，并递增索引
 			hop->recordIndex = recordIndicies[i]; i++;
+
+			// 创建构建请求记录，存储在记录数组中
 			hop->CreateBuildRequestRecord (records, msgID);
+
+			// 移动到下一个跳节点
 			hop = hop->next;
-		}
-		// fill up fake records with random data
-		for (int i = numHops; i < numRecords; i++)
-		{
-			int idx = recordIndicies[i];
-			RAND_bytes (records + idx*recordSize, recordSize);
+			
 		}
 
-		// decrypt real records
+		// 为未使用的记录位置生成伪造记录（填充随机数据）
+		for (int i = numHops; i < numRecords; i++)
+		{
+			int idx = recordIndicies[i];	// 获取当前未使用记录的索引
+			RAND_bytes (records + idx*recordSize, recordSize);	// 填充随机数据
+		}
+
+		 // 从最后一个跳节点的前一个跳开始，依次对每个跳节点的记录进行解密
 		hop = m_Config->GetLastHop ()->prev;
 		while (hop)
 		{
-			// decrypt records after current hop
+			// 解密当前跳节点后续的每个跳节点的记录
 			TunnelHopConfig * hop1 = hop->next;
 			while (hop1)
 			{
-				hop->DecryptRecord (records, hop1->recordIndex);
-				hop1 = hop1->next;
+				hop->DecryptRecord (records, hop1->recordIndex);	 // 对指定索引的记录进行解密
+				hop1 = hop1->next;	// 移动到下一个跳节点
 			}
-			hop = hop->prev;
+			hop = hop->prev;		// 向前移动到前一个跳节点
 		}
+
+		// 填充I2NP消息的头部，根据隧道类型选择不同的消息类型（短或可变隧道构建）
 		msg->FillI2NPMessageHeader (m_Config->IsShort () ? eI2NPShortTunnelBuild : eI2NPVariableTunnelBuild);
+
+		// 保存当前对象的智能指针（避免对象在消息发送过程中被销毁）
 		auto s = shared_from_this ();
+
+		// 设置消息丢弃时的回调函数，如果消息未发送，则打印日志并将隧道状态设置为构建失败
 		msg->onDrop = [s]()
 			{
 				LogPrint (eLogInfo, "I2NP: Tunnel ", s->GetTunnelID (), " request was not sent");
@@ -98,25 +133,31 @@ namespace tunnel
 			};
 		
 		// send message
-		if (outboundTunnel)
+		if (outboundTunnel)	// 如果有出站隧道
 		{
-			if (m_Config->IsShort ())
+			if (m_Config->IsShort ())	// 如果是短隧道
 			{
+				// 获取第一个跳节点的身份标识
 				auto ident = m_Config->GetFirstHop () ? m_Config->GetFirstHop ()->ident : nullptr;
+
+				// 如果第一个跳的身份哈希与出站隧道的下一个节点哈希不一致，则对消息进行加密
 				if (ident && ident->GetIdentHash () != outboundTunnel->GetNextIdentHash ()) // don't encrypt if IBGW = OBEP
 				{
+					// 使用跳节点的公钥对消息进行ECIES加密
 					auto msg1 = i2p::garlic::WrapECIESX25519MessageForRouter (msg, ident->GetEncryptionPublicKey ());
-					if (msg1) msg = msg1;
+					if (msg1) msg = msg1;	// 如果加密成功，替换原始消息
 				}
 			}
+			// 通过出站隧道发送隧道数据消息到下一个节点
 			outboundTunnel->SendTunnelDataMsgTo (GetNextIdentHash (), 0, msg);
 		}
-		else
+		else	// 没有出站隧道
 		{
+			 // 如果是短隧道，且最后一个跳的身份哈希与下一个节点的哈希不一致，添加Garlic密钥/标签
 			if (m_Config->IsShort () && m_Config->GetLastHop () &&
 				m_Config->GetLastHop ()->ident->GetIdentHash () != m_Config->GetLastHop ()->nextIdent)
 			{
-				// add garlic key/tag for reply
+				// 生成32字节的Garlic密钥
 				uint8_t key[32];
 				uint64_t tag = m_Config->GetLastHop ()->GetGarlicKey (key);
 				if (m_Pool && m_Pool->GetLocalDestination ())
@@ -891,24 +932,34 @@ namespace tunnel
 			newTunnel->SetTunnelPool (nullptr);
 	}
 
+	// 添加一个新的入站隧道到隧道集合中
 	void Tunnels::AddInboundTunnel (std::shared_ptr<InboundTunnel> newTunnel)
 	{
+		// 尝试将新隧道插入到 m_Tunnels 映射中，m_Tunnels 存储了隧道ID和隧道对象的映射
+		// emplace会就地构造元素，避免额外的复制或移动操作
+		// 第二个返回值.second是一个bool，如果插入成功则为true
 		if (m_Tunnels.emplace (newTunnel->GetTunnelID (), newTunnel).second)
 		{
 			m_InboundTunnels.push_back (newTunnel);
 			auto pool = newTunnel->GetTunnelPool ();
+
+			// 如果隧道没有所属的隧道池
 			if (!pool)
 			{
-				// build symmetric outbound tunnel
+				// 创建一个对称的出站隧道
+				// 使用newTunnel提供的配置来构建隧道配置
+				// GetNextOutboundTunnel()可能是用来获取下一个可用的出站隧道ID
 				CreateTunnel<OutboundTunnel> (std::make_shared<TunnelConfig>(newTunnel->GetInvertedPeers (),
 						newTunnel->GetNextTunnelID (), newTunnel->GetNextIdentHash (), false), nullptr,
 					GetNextOutboundTunnel ());
 			}
 			else
 			{
+				// 如果隧道池是活跃的，通知隧道池有新的隧道创建
 				if (pool->IsActive ())
 					pool->TunnelCreated (newTunnel);
 				else
+				// 如果隧道池不活跃，将隧道的池指针设置为nullptr
 					newTunnel->SetTunnelPool (nullptr);
 			}
 		}

@@ -13,6 +13,7 @@
 #include "Identity.h"
 #include "RouterContext.h"
 #include "Crypto.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -20,24 +21,36 @@ namespace tunnel
 {
 	struct TunnelHopConfig
 	{
+		// 当前跳点的身份
 		std::shared_ptr<const i2p::data::IdentityEx> ident;
+
+		// 下一个跳点的身份
 		i2p::data::IdentHash nextIdent;
 		uint32_t tunnelID, nextTunnelID;
-		uint8_t layerKey[32];
-		uint8_t ivKey[32];
-		uint8_t replyKey[32];
-		uint8_t replyIV[16];
+		uint8_t layerKey[32];		// 层密钥
+		uint8_t ivKey[32];			// 初始化向量密钥
+		uint8_t replyKey[32];		// 回复密钥
+		uint8_t replyIV[16];		// 回复初始化向量
 		bool isGateway, isEndpoint;
 
+		// 链表指针，用来指向上一跳和下一跳
 		TunnelHopConfig * next, * prev;
-		int recordIndex; // record # in tunnel build message
+		int recordIndex; // record # in tunnel build message，索引
 
+		// 构造函数，接受一个身份对象
 		TunnelHopConfig (std::shared_ptr<const i2p::data::IdentityEx> r);
 		virtual ~TunnelHopConfig () {};
 
+		// 设置下一个身份哈希
 		void SetNextIdent (const i2p::data::IdentHash& ident);
+
+		// 设置回复跳点的信息
 		void SetReplyHop (uint32_t replyTunnelID, const i2p::data::IdentHash& replyIdent);
+
+		 // 设置下一个跳点
 		void SetNext (TunnelHopConfig * n);
+
+		// 设置上一个跳点
 		void SetPrev (TunnelHopConfig * p);
 
 		virtual uint8_t GetRetCode (const uint8_t * records) const = 0;
@@ -149,13 +162,17 @@ namespace tunnel
 
 			virtual uint32_t GetTunnelID () const
 			{
-				if (!m_FirstHop) return 0;
+				if (!m_FirstHop) {
+					return 0; 
+				}
 				return IsInbound () ? m_LastHop->nextTunnelID : m_FirstHop->tunnelID;
 			}
 
 			virtual uint32_t GetNextTunnelID () const
 			{
-				if (!m_FirstHop) return 0;
+				if (!m_FirstHop) {
+					return 0;
+				}
 				return m_FirstHop->tunnelID;
 			}
 

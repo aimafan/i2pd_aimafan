@@ -26,6 +26,7 @@
 #include "ClientContext.h"
 #include "AddressBook.h"
 #include "Config.h"
+#include "Logger.h"
 
 namespace i2p
 {

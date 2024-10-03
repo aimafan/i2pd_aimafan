@@ -19,6 +19,7 @@
 #include "Tunnel.h"
 #include "TunnelPool.h"
 #include "Destination.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -67,22 +68,34 @@ namespace tunnel
 		DetachTunnels ();
 	}
 
-	void TunnelPool::SetExplicitPeers (std::shared_ptr<std::vector<i2p::data::IdentHash> > explicitPeers)
+	// 设置隧道池的明确指定的对等体（peers）
+	void TunnelPool::SetExplicitPeers(std::shared_ptr<std::vector<i2p::data::IdentHash>> explicitPeers)
 	{
+		// 将传入的明确指定的对等体列表赋值给成员变量m_ExplicitPeers
 		m_ExplicitPeers = explicitPeers;
+
+		// 如果提供了明确指定的对等体列表
 		if (m_ExplicitPeers)
 		{
-			int size = m_ExplicitPeers->size ();
+			// 获取列表的大小
+			int size = m_ExplicitPeers->size();
+
+			// 如果入站隧道的跳点数量大于列表的大小，调整入站隧道的跳点数量
 			if (m_NumInboundHops > size)
 			{
 				m_NumInboundHops = size;
-				LogPrint (eLogInfo, "Tunnels: Inbound tunnel length has been adjusted to ", size, " for explicit peers");
+				// 打印信息日志，说明入站隧道长度已根据明确指定的对等体列表的大小进行了调整
+				LogPrint(eLogInfo, "Tunnels: Inbound tunnel length has been adjusted to ", size, " for explicit peers");
 			}
+			// 如果出站隧道的跳点数量大于列表的大小，调整出站隧道的跳点数量
 			if (m_NumOutboundHops > size)
 			{
 				m_NumOutboundHops = size;
-				LogPrint (eLogInfo, "Tunnels: Outbound tunnel length has been adjusted to ", size, " for explicit peers");
+				// 打印信息日志，说明出站隧道长度已根据明确指定的对等体列表的大小进行了调整
+				LogPrint(eLogInfo, "Tunnels: Outbound tunnel length has been adjusted to ", size, " for explicit peers");
 			}
+
+			// 设置入站和出站隧道的数量为1，因为明确指定的对等体列表限制了隧道的构建
 			m_NumInboundTunnels = 1;
 			m_NumOutboundTunnels = 1;
 		}
@@ -607,22 +620,56 @@ namespace tunnel
 		return true;
 	}
 
+	// 挑选隧道的节点
 	bool TunnelPool::SelectPeers (Path& path, bool isInbound)
 	{
-		// explicit peers in use
-		if (m_ExplicitPeers) return SelectExplicitPeers (path, isInbound);
+		////////////////选择入站隧道/////////////////////////
+		// 创建一个智能指针，指向包含 IdentHash 对象的 vector
+		if(isInbound){
+			std::shared_ptr<std::vector<i2p::data::IdentHash>> explicitPeers =
+				std::make_shared<std::vector<i2p::data::IdentHash>>();
+
+			// 向 vector 中添加一些 IdentHash 对象
+			size_t ret;
+			i2p::data::IdentHash my_ident1;
+			ret = my_ident1.FromBase64("4jV0bGLNa1DNg6e-vrw30KTKbES98NmVaPQlvsxfI0I=");
+			explicitPeers->push_back(my_ident1);
+			i2p::data::IdentHash my_ident2;
+			ret = my_ident2.FromBase64("fwOptgWF3zskWoGfFxshL0FGcV6QBIKmg8QQKZDm5Ho=");
+			explicitPeers->push_back(my_ident2);
+			i2p::data::IdentHash my_ident3;
+			ret = my_ident3.FromBase64("F4kKzMs3hbrclWqCbGv4i3mKIYrbDvKlzEoMi3yK8Fc=");
+			explicitPeers->push_back(my_ident3);
+
+			SetExplicitPeers(explicitPeers);
+		}else{
+			m_ExplicitPeers = nullptr;
+		}
+
+		///////////////////////////////////////////////////////////////
+		// 如果使用了明确指定的对等体，调用SelectExplicitPeers函数选择对等体
+		if (m_ExplicitPeers) {
+			LogToFile("选择指定的入站隧道对等体，此时有 " + std::to_string(m_ExplicitPeers->size()) + " 个对等体");
+			return SelectExplicitPeers (path, isInbound);
+		}
+		// 很少明确有定义对等体
 		// calculate num hops
 		int numHops;
+		// 入站隧道配置跳数
 		if (isInbound)
 		{
 			numHops = m_NumInboundHops;
+			// 如果配置了入站跳点数量的随机偏差
 			if (m_InboundVariance)
 			{
 				int offset = rand () % (std::abs (m_InboundVariance) + 1);
 				if (m_InboundVariance < 0) offset = -offset;
+				// 将偏移量应用到跳点数量上
 				numHops += offset;
 			}
 		}
+
+		// 出站隧道配置跳数
 		else
 		{
 			numHops = m_NumOutboundHops;
@@ -638,39 +685,65 @@ namespace tunnel
 		// custom peer selector in use ?
 		{
 			std::lock_guard<std::mutex> lock(m_CustomPeerSelectorMutex);
-			if (m_CustomPeerSelector)
+			if (m_CustomPeerSelector){
+				// 调用自定义选择器的SelectPeers函数选择对等体
 				return m_CustomPeerSelector->SelectPeers(path, numHops, isInbound);
+			}
 		}
+		// 使用标准的对等体选择算法，大家基本都是这样
 		return StandardSelectPeers(path, numHops, isInbound, std::bind(&TunnelPool::SelectNextHop, this, 
 			std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 	}
 
+	// 从明确指定的对等体列表中选择隧道的对等体
 	bool TunnelPool::SelectExplicitPeers (Path& path, bool isInbound)
 	{
+		// 如果明确指定的对等体列表为空，返回false
 		if (!m_ExplicitPeers->size ()) return false;
+
+		// 根据是否是入站隧道，确定跳点数量
 		int numHops = isInbound ? m_NumInboundHops : m_NumOutboundHops;
+
+		// 如果需要的跳点数量超过了明确指定的对等体列表的大小，使用列表的大小作为跳点数量
 		if (numHops > (int)m_ExplicitPeers->size ()) numHops = m_ExplicitPeers->size ();
+
+		// 遍历跳点数量指定的次数
 		for (int i = 0; i < numHops; i++)
 		{
+			// 获取当前索引下的对等体标识
 			auto& ident = (*m_ExplicitPeers)[i];
+
+			// 在网络数据库中查找对应的路由器
 			auto r = i2p::data::netdb.FindRouter (ident);
+
+			// 如果找到了路由器
 			if (r)
 			{
+				LogToFile("找到了" + ident.ToBase32());
+				// 如果路由器支持ECIES加密
 				if (r->IsECIES ())
 				{
+					// 将路由器添加到路径的对等体列表中
 					path.Add (r);
+
+					// 如果是最后一个跳点，设置远端的兼容传输类型
 					if (i == numHops - 1)
 						path.farEndTransports = r->GetCompatibleTransports (isInbound);
 				}
 				else
 				{
+					// 如果路由器不支持ECIES加密，记录错误日志并返回false
 					LogPrint (eLogError, "Tunnels: ElGamal router ", ident.ToBase64 (), " is not supported");
 					return false;
 				}
 			}
 			else
 			{
+				// 如果没有找到任意一个路由器，之后也不会再找其他的
+				LogToFile("没有找到" + ident.ToBase32());
 				LogPrint (eLogInfo, "Tunnels: Can't find router for ", ident.ToBase64 ());
+
+				// 请求网络数据库获取对应的目的地
 				i2p::data::netdb.RequestDestination (ident);
 				return false;
 			}
@@ -678,22 +751,45 @@ namespace tunnel
 		return true;
 	}
 
+	// 创建入站隧道
 	void TunnelPool::CreateInboundTunnel ()
-	{
+	{	
+		// 正在创建目的地入站隧道
+		LogToFile("开始创建入站隧道");
 		LogPrint (eLogDebug, "Tunnels: Creating destination inbound tunnel...");
+
+		// 创建一个路径对象，用于存储隧道的跳点信息
 		Path path;
+
+		// 调用SelectPeers函数选择隧道的对等体（peers）
+		// 第二个参数true表示这是一个入站隧道
 		if (SelectPeers (path, true))
 		{
+			// 获取下一个可用的出站隧道，考虑远端支持的传输类型
 			auto outboundTunnel = GetNextOutboundTunnel (nullptr, path.farEndTransports);
+
+			// 如果没有可用的出站隧道，尝试获取任意可用的出站隧道
 			if (!outboundTunnel)
 				outboundTunnel = tunnels.GetNextOutboundTunnel ();
+
+			// 创建隧道配置对象
 			std::shared_ptr<TunnelConfig> config;
+
+			// 如果入站跳点数量大于0，说明需要创建一个有跳点的隧道
 			if (m_NumInboundHops > 0)
 			{
+				// 将路径中的跳点反转，因为入站隧道的路径需要反向
 				path.Reverse ();
+				// 创建隧道配置对象，包含跳点信息、是否为短隧道和远端传输类型
 				config = std::make_shared<TunnelConfig> (path.peers, path.isShort, path.farEndTransports);
 			}
+
+			// 使用隧道配置创建一个新的入站隧道
+			// shared_from_this()返回当前TunnelPool对象的shared_ptr
+			// outboundTunnel是与入站隧道配对的出站隧道
 			auto tunnel = tunnels.CreateInboundTunnel (config, shared_from_this (), outboundTunnel);
+
+			// 如果隧道已经建立（零跳点隧道），则调用TunnelCreated函数处理
 			if (tunnel->IsEstablished ()) // zero hops
 				TunnelCreated (tunnel);
 		}
@@ -703,6 +799,7 @@ namespace tunnel
 
 	void TunnelPool::RecreateInboundTunnel (std::shared_ptr<InboundTunnel> tunnel)
 	{
+		LogToFile("重新创建一个隧道");
 		if (IsExploratory () || tunnel->IsSlow ()) // always create new exploratory tunnel or if slow
 		{
 			CreateInboundTunnel ();

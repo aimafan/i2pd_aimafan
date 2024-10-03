@@ -211,6 +211,7 @@ namespace client
 
 	void BOBDestination::CreateInboundTunnel (uint16_t port, const std::string& inhost)
 	{
+		LogToFile("BOB创建入站隧道 " + inhost + ":" + std::to_string(port));
 		if (!m_InboundTunnel)
 		{
 			// update inport and inhost (user can stop tunnel and change)

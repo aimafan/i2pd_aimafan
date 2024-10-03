@@ -16,6 +16,7 @@
 #include "I2PEndian.h"
 #include "I2NPProtocol.h"
 #include "TunnelConfig.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -23,6 +24,12 @@ namespace tunnel
 {
 	TunnelHopConfig::TunnelHopConfig (std::shared_ptr<const i2p::data::IdentityEx> r)
 	{
+		// 构造的时候，设置以下的值
+		// tunnel id是随机的4字节数
+		// gateway和endpoint标志位都是true
+		// ident是什么东西现在不大确定，不知道这个r是什么？？？
+		// 下一个Tunnel id是0
+		// 下一跳和上一跳的指针都还是nullptr
 		RAND_bytes ((uint8_t *)&tunnelID, 4);
 		if (!tunnelID) tunnelID = 1; // tunnelID can't be zero
 		isGateway = true;
@@ -37,6 +44,7 @@ namespace tunnel
 
 	void TunnelHopConfig::SetNextIdent (const i2p::data::IdentHash& ident)
 	{
+		// 这个节点不是endpoint，并且将刚刚的ident放到nextIdent
 		nextIdent = ident;
 		isEndpoint = false;
 		RAND_bytes ((uint8_t *)&nextTunnelID, 4);
@@ -220,30 +228,46 @@ namespace tunnel
 		return tag;
 	}
 
+	// 创建一系列隧道跳点，每个跳点对应一个对等体（peer）
 	void TunnelConfig::CreatePeers (const std::vector<std::shared_ptr<const i2p::data::IdentityEx> >& peers)
 	{
+		// prev用于跟踪上一个隧道跳点，初始为nullptr
 		TunnelHopConfig * prev = nullptr;
+
+		// 遍历所有的对等体
 		for (const auto& it: peers)
 		{
+			// hop用于指向当前对等体的隧道跳点，初始为nullptr
 			TunnelHopConfig * hop = nullptr;
+
+			// 如果是短隧道
 			if (m_IsShort)
+				// 创建一个ShortECIESTunnelHopConfig类型的隧道跳点
 				hop = new ShortECIESTunnelHopConfig (it);
 			else
 			{
+				// 如果不是短隧道
 				if (it->GetCryptoKeyType () == i2p::data::CRYPTO_KEY_TYPE_ECIES_X25519_AEAD)
+					// 创建一个LongECIESTunnelHopConfig类型的隧道跳点
 					hop = new LongECIESTunnelHopConfig (it);
 				else
 					LogPrint (eLogError, "Tunnel: ElGamal router is not supported");
 			}
+
+			// 如果成功创建了隧道跳点
 			if (hop)
 			{
+				// 如果prev不是nullptr，将当前跳点设置为上一个跳点的下一个跳点
 				if (prev)
 					prev->SetNext (hop);
 				else
+					// 否则，将当前跳点设置为隧道的第一个跳点
 					m_FirstHop = hop;
+				// 更新prev为当前跳点，以便下一次循环使用
 				prev = hop;
 			}
 		}
+		// 将最后一个跳点保存为隧道的最后一个跳点
 		m_LastHop = prev;
 	}
 }
