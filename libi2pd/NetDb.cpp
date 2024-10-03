@@ -31,13 +31,45 @@
 
 using namespace i2p::transport;
 
+std::string getstoretype(uint8_t storetype){
+	if(storetype == i2p::data::NETDB_STORE_TYPE_STANDARD_LEASESET2){
+		return "STANDARD_LEASESET2";
+	} else if (storetype == i2p::data::NETDB_STORE_TYPE_ENCRYPTED_LEASESET2){
+		return "ENCRYPTED_LEASESET2";
+	} else if( storetype == i2p::data::NETDB_STORE_TYPE_META_LEASESET2){
+		return "META_LEASESET2";
+	}else if (storetype == i2p::data::NETDB_STORE_TYPE_LEASESET){
+		return "LEASESET";
+	}else{
+		return "Unknown";
+	}
+	
+}
+
+std::string getcryptotype2(i2p::data::CryptoKeyType crytype){
+	if(crytype == i2p::data::CRYPTO_KEY_TYPE_ELGAMAL){
+		return "ELGAMAL";
+	} else if (crytype == i2p::data::CRYPTO_KEY_TYPE_ECIES_X25519_AEAD){
+		return "ECIES_X25519_AEAD";
+	} else if( crytype == i2p::data::CRYPTO_KEY_TYPE_ECIES_P256_SHA256_AES256CBC){
+		return "ECIES_P256_SHA256_AES256CBC";
+	}else if (crytype == i2p::data::CRYPTO_KEY_TYPE_ECIES_P256_SHA256_AES256CBC_TEST){
+		return "ECIES_P256_SHA256_AES256CBC_TEST";
+	} else if (crytype == i2p::data::CRYPTO_KEY_TYPE_ECIES_GOSTR3410_CRYPTO_PRO_A_SHA256_AES256CBC){
+		return "ECIES_GOSTR3410_CRYPTO_PRO_A_SHA256_AES256CBC";
+	}else{
+		return "Unknown";
+	}
+	
+}
+
 namespace i2p
 {
 namespace data
 {
 	NetDb netdb;
 
-	NetDb::NetDb (): m_IsRunning (false), m_Thread (nullptr), m_Reseeder (nullptr), m_Storage("netDb", "r", "routerInfo-", "dat"), m_PersistProfiles (true), producer()
+	NetDb::NetDb (): m_IsRunning (false), m_Thread (nullptr), m_Reseeder (nullptr), m_Storage("netDb", "r", "routerInfo-", "dat"), m_PersistProfiles (true)
 	{
 	}
 
@@ -111,7 +143,6 @@ namespace data
 		uint64_t lastProfilesCleanup = i2p::util::GetMonotonicMilliseconds (), lastObsoleteProfilesCleanup = lastProfilesCleanup;
 		int16_t profilesCleanupVariance = 0, obsoleteProfilesCleanVariance = 0;
 
-		producer.KafkaProducer_connect("172.89.0.2:9092", "LeaseSets", 0);
 
 		while (m_IsRunning)
 		{
@@ -402,12 +433,36 @@ namespace data
 	bool NetDb::AddLeaseSet2 (const IdentHash& ident, const uint8_t * buf, int len, uint8_t storeType)
 	{
 		auto leaseSet = std::make_shared<LeaseSet2> (storeType, buf, len, false); // we don't need leases in netdb
-		std::string message = ident.ToBase64();
-		producer.pushMessage("LeaseSets[|]" + message);
-		LogToFile("LeaseSets2 " + ident.ToBase32());
+		// std::string message = ident.ToBase32();
+
 		// 应该基本都是LeaseSets2的流量
 		if (leaseSet->IsValid ())
 		{
+			/*B================将LeaseSet的数据输出到日志===============*/
+			if(storeType != NETDB_STORE_TYPE_ENCRYPTED_LEASESET2){
+				std::vector<std::tuple<std::string, std::string, uint64_t>> leasesVector;
+				for (int i = 0; i < leaseSet->GetNonExpiredLeases().size(); i++)
+				{
+					auto nonExpiredLease = leaseSet->GetNonExpiredLeases()[i];
+					leasesVector.push_back(std::make_tuple(nonExpiredLease->tunnelGateway.ToBase64(), std::to_string(nonExpiredLease->tunnelID), nonExpiredLease->endDate));
+					
+				}
+				std::string ident_hash = leaseSet->GetIdentHash().ToBase32();
+				std::string cryptotype = getcryptotype2(leaseSet->GetEncryptionType());
+				uint64_t expiration_time = leaseSet->GetExpirationTime();
+				std::string storetype = getstoretype(leaseSet->GetStoreType());
+
+				std::string message = ident_hash + " ; ";
+				for (const auto& lease : leasesVector) {
+					std::string leaseMessage = std::get<0>(lease) + "[|]" + std::get<1>(lease) + " ; ";
+					message += leaseMessage;
+				}
+
+				LogToFile(message);
+
+			}
+			
+			/*E========================================================*/
 			std::lock_guard<std::mutex> lock(m_LeaseSetsMutex);
 			auto it = m_LeaseSets.find(ident);
 			if (it == m_LeaseSets.end () || it->second->GetStoreType () != storeType ||

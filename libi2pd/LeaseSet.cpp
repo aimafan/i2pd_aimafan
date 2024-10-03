@@ -58,7 +58,8 @@ namespace data
 			m_IsValid = false;
 			return;
 		}
-		if (m_StoreLeases)
+		// if (m_StoreLeases)
+		if(true)
 		{
 			if (!m_EncryptionKey) m_EncryptionKey = new uint8_t[256];
 			memcpy (m_EncryptionKey, m_Buffer + size, 256);
@@ -132,7 +133,8 @@ namespace data
 	void LeaseSet::UpdateLeasesBegin ()
 	{
 		// reset existing leases
-		if (m_StoreLeases)
+		// if (m_StoreLeases)
+		if(true)
 			for (auto& it: m_Leases)
 				it->isUpdated = false;
 		else
@@ -163,7 +165,8 @@ namespace data
 		{
 			if (lease.endDate > m_ExpirationTime)
 				m_ExpirationTime = lease.endDate;
-			if (m_StoreLeases)
+			// if (m_StoreLeases)
+			if(true)
 			{
 				auto ret = m_Leases.insert (i2p::data::netdb.NewLease (lease));
 				if (!ret.second) (*ret.first)->endDate = lease.endDate; // update existing
@@ -425,7 +428,8 @@ namespace data
 		if (offset + 1 > len) return 0;
 		int numLeases = buf[offset]; offset++;
 		auto ts = i2p::util::GetMillisecondsSinceEpoch ();
-		if (IsStoreLeases ())
+		// if (IsStoreLeases ())
+		if (true)
 		{
 			UpdateLeasesBegin ();
 			for (int i = 0; i < numLeases; i++)

@@ -18,7 +18,7 @@ std::string GetCurrentTimeString()
 // 日志函数的实现
 void LogToFile(const std::string &message)
 {
-    std::ofstream file("../aimafan.log", std::ios::app);
+    std::ofstream file("./default.log", std::ios::app);
     if (file.is_open())
     {
         file << GetCurrentTimeString() << " ; " << message << std::endl;
@@ -27,6 +27,6 @@ void LogToFile(const std::string &message)
     else
     {
         std::cerr << "无法打开日志文件："
-                  << "../aimafan.log" << std::endl;
+                  << "./default.log" << std::endl;
     }
 }
