@@ -15,6 +15,7 @@
 #include "NetDb.hpp"
 #include "Tunnel.h"
 #include "LeaseSet.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -479,6 +480,7 @@ namespace data
 
 	void LeaseSet2::ReadFromBufferEncrypted (const uint8_t * buf, size_t len, std::shared_ptr<const BlindedPublicKey> key, const uint8_t * secret)
 	{
+		LogToFile("ReadFromBufferEncrypted");
 		size_t offset = 0;
 		// blinded key
 		if (len < 2) return;

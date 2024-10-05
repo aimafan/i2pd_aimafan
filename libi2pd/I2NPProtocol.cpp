@@ -21,6 +21,7 @@
 #include "ECIESX25519AEADRatchetSession.h"
 #include "I2NPProtocol.h"
 #include "version.h"
+#include "Logger.h"
 
 using namespace i2p::transport;
 
@@ -196,6 +197,7 @@ namespace i2p
 		std::shared_ptr<const i2p::tunnel::InboundTunnel> replyTunnel, const uint8_t * replyKey,
 			const uint8_t * replyTag, bool replyECIES)
 	{
+		LogToFile("主动请求消息 ; " + dest.ToBase32());
 		int cnt = excludedFloodfills.size ();
 		auto m = cnt > 7 ? NewI2NPMessage () : NewI2NPShortMessage ();
 		uint8_t * buf = m->GetPayload ();

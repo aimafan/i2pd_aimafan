@@ -445,7 +445,6 @@ namespace data
 				{
 					auto nonExpiredLease = leaseSet->GetNonExpiredLeases()[i];
 					leasesVector.push_back(std::make_tuple(nonExpiredLease->tunnelGateway.ToBase64(), std::to_string(nonExpiredLease->tunnelID), nonExpiredLease->endDate));
-					
 				}
 				std::string ident_hash = leaseSet->GetIdentHash().ToBase32();
 				std::string cryptotype = getcryptotype2(leaseSet->GetEncryptionType());
@@ -831,33 +830,50 @@ namespace data
 
 	void NetDb::RequestDestination (const IdentHash& destination, RequestedDestination::RequestComplete requestComplete, bool direct)
 	{
+		// LogToFile("开始搜索 ; " + destination.ToBase32());
+		// 如果路线受限，禁止直接通信，强制使用隧道
 		if (direct && i2p::transport::transports.RoutesRestricted ()) direct = false; // always use tunnels for restricted routes
+		
+		// 创建一个新的请求对象，非探索请求（non-exploratory）
 		auto dest = m_Requests.CreateRequest (destination, false, direct, requestComplete); // non-exploratory
+		
+		// 如果请求已存在，记录警告日志并返回
 		if (!dest)
 		{
 			LogPrint (eLogWarning, "NetDb: Destination ", destination.ToBase64(), " is requested already");
 			return;
 		}
 
+		// 查找与目标最接近的Floodfill节点（Floodfill是存储路由信息的I2P节点）
 		auto floodfill = GetClosestFloodfill (destination, dest->GetExcludedPeers ());
+		
 		if (floodfill)
 		{
+			// 如果目标节点无法直接从当前路由器到达，或者未连接到目标，禁用直接通信
 			if (direct && !floodfill->IsReachableFrom (i2p::context.GetRouterInfo ()) &&
 				!i2p::transport::transports.IsConnected (floodfill->GetIdentHash ()))
 				direct = false; // floodfill can't be reached directly
+
+			// 如果允许直接通信，创建并发送请求消息
 			if (direct)
 			{
+				// 创建请求消息，设置消息丢失时的处理逻辑（尝试下一个请求）
 				auto msg = dest->CreateRequestMessage (floodfill->GetIdentHash ());
 				msg->onDrop = [this, dest]() { if (dest->IsActive ()) this->m_Requests.SendNextRequest (dest); }; 
+				// 通过传输模块发送消息到Floodfill节点
 				transports.SendMessage (floodfill->GetIdentHash (), msg);
-			}	
+			}    
 			else
 			{
-				auto pool = i2p::tunnel::tunnels.GetExploratoryPool ();
+				// 如果不能直接通信，通过隧道发送消息
+				auto pool = i2p::tunnel::tunnels.GetExploratoryPool (); // 获取探索隧道池
+				// 获取下一个可用的出站隧道和入站隧道
 				auto outbound = pool ? pool->GetNextOutboundTunnel (nullptr, floodfill->GetCompatibleTransports (false)) : nullptr;
 				auto inbound = pool ? pool->GetNextInboundTunnel (nullptr, floodfill->GetCompatibleTransports (true)) : nullptr;
-				if (outbound &&	inbound)
+				
+				if (outbound && inbound)
 				{
+					// 创建请求消息并通过隧道发送
 					auto msg = dest->CreateRequestMessage (floodfill, inbound);
 					msg->onDrop = [this, dest]() { if (dest->IsActive ()) this->m_Requests.SendNextRequest (dest); }; 
 					outbound->SendTunnelDataMsgTo (floodfill->GetIdentHash (), 0,
@@ -865,14 +881,18 @@ namespace data
 				}
 				else
 				{
+					// 没有可用隧道，记录错误日志
 					LogPrint (eLogError, "NetDb: ", destination.ToBase64(), " destination requested, but no tunnels found");
+					// 请求失败，回调通知
 					m_Requests.RequestComplete (destination, nullptr);
 				}
 			}
 		}
 		else
 		{
+			// 没有找到合适的Floodfill节点，记录错误日志
 			LogPrint (eLogError, "NetDb: ", destination.ToBase64(), " destination requested, but no floodfills found");
+			// 请求失败，回调通知
 			m_Requests.RequestComplete (destination, nullptr);
 		}
 	}
@@ -1042,48 +1062,70 @@ namespace data
 
 	void NetDb::HandleDatabaseSearchReplyMsg (std::shared_ptr<const I2NPMessage> msg)
 	{
+		// 获取消息的有效负载部分
 		const uint8_t * buf = msg->GetPayload ();
+		
+		// 将前32字节转换为Base64字符串，存储在key中
 		char key[48];
 		int l = i2p::data::ByteStreamToBase64 (buf, 32, key, 48);
-		key[l] = 0;
+		key[l] = 0; // 在字符串末尾添加null字符
+
+		// 获取32字节之后的第一个字节作为num，表示回复的节点数量
 		int num = buf[32]; // num
 		LogPrint (eLogDebug, "NetDb: DatabaseSearchReply for ", key, " num=", num);
+
+		// 从buf中构造IdentHash，表示请求的标识符
 		IdentHash ident (buf);
+		
+		// 在请求队列中查找与ident匹配的请求
 		auto dest = m_Requests.FindRequest (ident);
+		
 		if (dest)
 		{
+			// 如果num > 0，继续发送下一个请求
 			if (num > 0)
-				// try to send next requests
+				// 尝试发送下一个请求
 				m_Requests.SendNextRequest (dest);
 			else
-				// no more requests for destination possible. delete it
+				// 没有更多请求可发送，删除请求
 				m_Requests.RequestComplete (ident, nullptr);
 		}
-		else if(!m_FloodfillBootstrap)
+		else if (!m_FloodfillBootstrap)
+			// 如果没有找到请求，且没有Floodfill引导，记录警告日志
 			LogPrint (eLogWarning, "NetDb: Requested destination for ", key, " not found");
 
-		// try responses
+		// 尝试处理回复中的节点信息
 		for (int i = 0; i < num; i++)
 		{
-			const uint8_t * router = buf + 33 + i*32;
+			// 每个路由器信息占32字节，从第33字节开始读取
+			const uint8_t * router = buf + 33 + i * 32;
+			
+			// 将路由器的32字节标识符转换为Base64字符串
 			char peerHash[48];
 			int l1 = i2p::data::ByteStreamToBase64 (router, 32, peerHash, 48);
-			peerHash[l1] = 0;
+			peerHash[l1] = 0; // 末尾添加null字符
+			
 			LogPrint (eLogDebug, "NetDb: ", i, ": ", peerHash);
 
+			// 查找路由器信息，如果未找到或信息过旧（超过1小时），则请求新的RouterInfo
 			auto r = FindRouter (router);
-			if (!r || i2p::util::GetMillisecondsSinceEpoch () > r->GetTimestamp () + 3600*1000LL)
+			if (!r || i2p::util::GetMillisecondsSinceEpoch () > r->GetTimestamp () + 3600 * 1000LL)
 			{
-				// router with ident not found or too old (1 hour)
+				// 如果路由器信息不存在或超过1小时，重新请求RouterInfo
 				LogPrint (eLogDebug, "NetDb: Found new/outdated router. Requesting RouterInfo...");
-				if(m_FloodfillBootstrap)
+				
+				// 如果存在Floodfill引导，则从引导节点请求目的地信息
+				if (m_FloodfillBootstrap)
 					RequestDestinationFrom(router, m_FloodfillBootstrap->GetIdentHash(), true);
+				// 否则，检查路由器是否被封禁，未被封禁则请求目的地信息
 				else if (!IsRouterBanned (router))
 					RequestDestination (router);
 				else
+					// 如果路由器被封禁，跳过该节点
 					LogPrint (eLogDebug, "NetDb: Router ", peerHash, " is banned. Skipped");
 			}
 			else
+				// 如果路由器信息是最新的，记录调试日志
 				LogPrint (eLogDebug, "NetDb: [:|||:]");
 		}
 	}

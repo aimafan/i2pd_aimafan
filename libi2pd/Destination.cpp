@@ -18,6 +18,7 @@
 #include "Timestamp.h"
 #include "NetDb.hpp"
 #include "Destination.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -389,139 +390,193 @@ namespace client
 		return true;
 	}
 
-	void LeaseSetDestination::HandleDatabaseStoreMessage (const uint8_t * buf, size_t len)
+	void LeaseSetDestination::HandleDatabaseStoreMessage(const uint8_t *buf, size_t len)
 	{
+		// 如果消息长度小于数据库存储消息头部的大小，记录错误日志并返回
 		if (len < DATABASE_STORE_HEADER_SIZE)
 		{
-			LogPrint (eLogError, "Destination: Database store msg is too short ", len);
+			LogPrint(eLogError, "Destination: Database store msg is too short ", len);
 			return;
 		}
-		uint32_t replyToken = bufbe32toh (buf + DATABASE_STORE_REPLY_TOKEN_OFFSET);
+
+		// 从消息中提取回复令牌
+		uint32_t replyToken = bufbe32toh(buf + DATABASE_STORE_REPLY_TOKEN_OFFSET);
 		size_t offset = DATABASE_STORE_HEADER_SIZE;
+
+		// 如果有回复令牌，记录日志并增加偏移量（忽略回复令牌）
 		if (replyToken)
 		{
-			LogPrint (eLogInfo, "Destination: Reply token is ignored for DatabaseStore");
+			LogPrint(eLogInfo, "Destination: Reply token is ignored for DatabaseStore");
 			offset += 36;
 		}
+
+		// 检查消息长度是否合法，如果长度超出最大值或偏移量无效，记录错误日志并返回
 		if (offset > len || len > i2p::data::MAX_LS_BUFFER_SIZE + offset)
 		{
-			LogPrint (eLogError, "Destination: Database store message is too long ", len);
+			LogPrint(eLogError, "Destination: Database store message is too long ", len);
 			return;
 		}
-		i2p::data::IdentHash key (buf + DATABASE_STORE_KEY_OFFSET);
+
+		// 提取消息中的键值
+		i2p::data::IdentHash key(buf + DATABASE_STORE_KEY_OFFSET);
+		
+
+		// 初始化LeaseSet和LeaseSetRequest的指针
 		std::shared_ptr<i2p::data::LeaseSet> leaseSet;
 		std::shared_ptr<LeaseSetRequest> request;
+
+		// 根据消息中的类型字段进行不同处理
 		switch (buf[DATABASE_STORE_TYPE_OFFSET])
 		{
-			case i2p::data::NETDB_STORE_TYPE_LEASESET: // 1
-			case i2p::data::NETDB_STORE_TYPE_STANDARD_LEASESET2: // 3
+			// 处理LeaseSet和标准LeaseSet2类型
+			case i2p::data::NETDB_STORE_TYPE_LEASESET:       // 类型1
+			case i2p::data::NETDB_STORE_TYPE_STANDARD_LEASESET2: // 类型3
 			{
-				LogPrint (eLogDebug, "Destination: Remote LeaseSet");
+				LogPrint(eLogDebug, "Destination: Remote LeaseSet");
+
+				// 锁住远程LeaseSet的互斥量，查找现有的LeaseSet
 				std::lock_guard<std::mutex> lock(m_RemoteLeaseSetsMutex);
-				auto it = m_RemoteLeaseSets.find (key);
-				if (it != m_RemoteLeaseSets.end () &&
-					it->second->GetStoreType () == buf[DATABASE_STORE_TYPE_OFFSET]) // update only if same type
+				auto it = m_RemoteLeaseSets.find(key);
+
+				// 如果找到相同类型的LeaseSet，检查它是否更新
+				if (it != m_RemoteLeaseSets.end() &&
+					it->second->GetStoreType() == buf[DATABASE_STORE_TYPE_OFFSET]) // 只有相同类型才更新
 				{
 					leaseSet = it->second;
-					if (leaseSet->IsNewer (buf + offset, len - offset))
+					if (leaseSet->IsNewer(buf + offset, len - offset))
 					{
-						leaseSet->Update (buf + offset, len - offset);
-						if (leaseSet->IsValid () && leaseSet->GetIdentHash () == key && !leaseSet->IsExpired ())
-							LogPrint (eLogDebug, "Destination: Remote LeaseSet updated");
+						// 更新LeaseSet，如果更新后有效且未过期，则保持更新
+						leaseSet->Update(buf + offset, len - offset);
+						if (leaseSet->IsValid() && leaseSet->GetIdentHash() == key && !leaseSet->IsExpired())
+							LogPrint(eLogDebug, "Destination: Remote LeaseSet updated");
 						else
 						{
-							LogPrint (eLogDebug, "Destination: Remote LeaseSet update failed");
-							m_RemoteLeaseSets.erase (it);
+							// 如果更新失败，则从集合中移除
+							LogPrint(eLogDebug, "Destination: Remote LeaseSet update failed");
+							m_RemoteLeaseSets.erase(it);
 							leaseSet = nullptr;
 						}
 					}
 					else
-						LogPrint (eLogDebug, "Destination: Remote LeaseSet is older. Not updated");
+						LogPrint(eLogDebug, "Destination: Remote LeaseSet is older. Not updated");
 				}
 				else
 				{
-					// add or replace
+					// 如果没有相同类型的LeaseSet，创建一个新的LeaseSet
 					if (buf[DATABASE_STORE_TYPE_OFFSET] == i2p::data::NETDB_STORE_TYPE_LEASESET)
-						leaseSet = std::make_shared<i2p::data::LeaseSet> (buf + offset, len - offset); // LeaseSet
+						leaseSet = std::make_shared<i2p::data::LeaseSet>(buf + offset, len - offset); // LeaseSet
 					else
-						leaseSet = std::make_shared<i2p::data::LeaseSet2> (buf[DATABASE_STORE_TYPE_OFFSET], buf + offset, len - offset, true, GetPreferredCryptoType () ); // LeaseSet2
-					if (leaseSet->IsValid () && leaseSet->GetIdentHash () == key && !leaseSet->IsExpired ())
+						leaseSet = std::make_shared<i2p::data::LeaseSet2>(buf[DATABASE_STORE_TYPE_OFFSET], buf + offset, len - offset, true, GetPreferredCryptoType()); // LeaseSet2
+
+					// 检查新创建的LeaseSet是否有效，如果有效则添加到远程LeaseSet集合中
+					if (leaseSet->IsValid() && leaseSet->GetIdentHash() == key && !leaseSet->IsExpired())
 					{
-						if (leaseSet->GetIdentHash () != GetIdentHash ())
+						if (leaseSet->GetIdentHash() != GetIdentHash())
 						{
-							LogPrint (eLogDebug, "Destination: New remote LeaseSet added");
+							LogPrint(eLogDebug, "Destination: New remote LeaseSet added");
 							m_RemoteLeaseSets[key] = leaseSet;
 						}
 						else
-							LogPrint (eLogDebug, "Destination: Own remote LeaseSet dropped");
+							LogPrint(eLogDebug, "Destination: Own remote LeaseSet dropped");
 					}
 					else
 					{
-						LogPrint (eLogError, "Destination: New remote LeaseSet failed");
+						LogPrint(eLogError, "Destination: New remote LeaseSet failed");
 						leaseSet = nullptr;
 					}
 				}
 				break;
 			}
-			case i2p::data::NETDB_STORE_TYPE_ENCRYPTED_LEASESET2: // 5
+
+			// 处理加密的LeaseSet2类型
+			case i2p::data::NETDB_STORE_TYPE_ENCRYPTED_LEASESET2: // 类型5
 			{
-				auto it2 = m_LeaseSetRequests.find (key);
-				if (it2 != m_LeaseSetRequests.end ())
-				{	
+				auto it2 = m_LeaseSetRequests.find(key);
+				if (it2 != m_LeaseSetRequests.end())
+				{
 					request = it2->second;
-					m_LeaseSetRequests.erase (it2);
+					m_LeaseSetRequests.erase(it2);
+
+					// 如果存在请求的盲签名密钥
 					if (request->requestedBlindedKey)
 					{
-						auto ls2 = std::make_shared<i2p::data::LeaseSet2> (buf + offset, len - offset,
-							request->requestedBlindedKey, m_LeaseSetPrivKey ? ((const uint8_t *)*m_LeaseSetPrivKey) : nullptr , GetPreferredCryptoType ());
-						if (ls2->IsValid () && !ls2->IsExpired ())
+						// 创建加密的LeaseSet2
+						auto ls2 = std::make_shared<i2p::data::LeaseSet2>(buf + offset, len - offset,
+							request->requestedBlindedKey, m_LeaseSetPrivKey ? ((const uint8_t *)*m_LeaseSetPrivKey) : nullptr, GetPreferredCryptoType());
+						if (ls2->IsValid() && !ls2->IsExpired())
 						{
 							leaseSet = ls2;
 							std::lock_guard<std::mutex> lock(m_RemoteLeaseSetsMutex);
-							m_RemoteLeaseSets[ls2->GetIdentHash ()] = ls2; // ident is not key
-							m_RemoteLeaseSets[key] = ls2; // also store as key for next lookup
+							m_RemoteLeaseSets[ls2->GetIdentHash()] = ls2; // ident 不是键
+							m_RemoteLeaseSets[key] = ls2; // 也存储为键
 						}
 						else
-							LogPrint (eLogError, "Destination: New remote encrypted LeaseSet2 failed");
+							LogPrint(eLogError, "Destination: New remote encrypted LeaseSet2 failed");
 					}
 					else
 					{
-						// publishing verification doesn't have requestedBlindedKey
-						auto localLeaseSet = GetLeaseSetMt ();
-						if (localLeaseSet->GetStoreHash () == key)
-						{	
-							auto ls = std::make_shared<i2p::data::LeaseSet2> (i2p::data::NETDB_STORE_TYPE_ENCRYPTED_LEASESET2, 
-								localLeaseSet->GetBuffer (), localLeaseSet->GetBufferLen (), false);
-							leaseSet = ls;	
-						}	
+						// 如果发布的验证没有请求盲签名密钥，检查本地LeaseSet的存储哈希
+						auto localLeaseSet = GetLeaseSetMt();
+						if (localLeaseSet->GetStoreHash() == key)
+						{
+							// 创建一个LeaseSet2副本
+							auto ls = std::make_shared<i2p::data::LeaseSet2>(i2p::data::NETDB_STORE_TYPE_ENCRYPTED_LEASESET2,
+								localLeaseSet->GetBuffer(), localLeaseSet->GetBufferLen(), false);
+							leaseSet = ls;
+						}
 						else
-							LogPrint (eLogWarning, "Destination: Encrypted LeaseSet2 received for request without blinded key");
-					}	
+							LogPrint(eLogWarning, "Destination: Encrypted LeaseSet2 received for request without blinded key");
+					}
 				}
 				else
-					LogPrint (eLogWarning, "Destination: Couldn't find request for encrypted LeaseSet2");
+					LogPrint(eLogWarning, "Destination: Couldn't find request for encrypted LeaseSet2");
 				break;
 			}
+
+			// 处理未预期的类型，记录错误日志
 			default:
-				LogPrint (eLogError, "Destination: Unexpected client's DatabaseStore type ", buf[DATABASE_STORE_TYPE_OFFSET], ", dropped");
+				LogPrint(eLogError, "Destination: Unexpected client's DatabaseStore type ", buf[DATABASE_STORE_TYPE_OFFSET], ", dropped");
 		}
 
+		//=================输出LeaseSets信息======================
+		std::vector<std::tuple<std::string, std::string, uint64_t>> leasesVector;
+		for (int i = 0; i < leaseSet->GetNonExpiredLeases().size(); i++)
+		{
+			auto nonExpiredLease = leaseSet->GetNonExpiredLeases()[i];
+			leasesVector.push_back(std::make_tuple(nonExpiredLease->tunnelGateway.ToBase64(), std::to_string(nonExpiredLease->tunnelID), nonExpiredLease->endDate));
+		}
+		std::string ident_hash = leaseSet->GetIdentHash().ToBase32();
+
+		std::string message = ident_hash + " ; ";
+		for (const auto& lease : leasesVector) {
+			std::string leaseMessage = std::get<0>(lease) + "[|]" + std::get<1>(lease) + " ; ";
+			message += leaseMessage;
+		}
+
+		LogToFile("收到了回应的消息 ; " + message);
+
+		//===========================================================//
+
+		// 如果请求对象为空，则从LeaseSet请求集合中找到相关的请求对象
 		if (!request)
-		{	
-			auto it1 = m_LeaseSetRequests.find (key);
-			if (it1 != m_LeaseSetRequests.end ())
-			{	
+		{
+			auto it1 = m_LeaseSetRequests.find(key);
+			if (it1 != m_LeaseSetRequests.end())
+			{
 				request = it1->second;
-				m_LeaseSetRequests.erase (it1);
-			}	
-		}	
+				m_LeaseSetRequests.erase(it1);
+			}
+		}
+
+		// 如果找到请求对象，取消其超时计时器并完成该请求
 		if (request)
 		{
-			request->requestTimeoutTimer.cancel ();
-			request->Complete (leaseSet);
+			request->requestTimeoutTimer.cancel();
+			request->Complete(leaseSet);
 		}
 	}
 
+	// 这里处理LeaseSetDatabaseLookupMsg回来的数据的，看看这个里面包括什么
 	void LeaseSetDestination::HandleDatabaseSearchReplyMessage (const uint8_t * buf, size_t len)
 	{
 		i2p::data::IdentHash key (buf);
