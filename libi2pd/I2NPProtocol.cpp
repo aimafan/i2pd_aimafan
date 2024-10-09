@@ -711,21 +711,47 @@ namespace i2p
 
 	std::shared_ptr<I2NPMessage> CreateTunnelDataMsg (const uint8_t * buf)
 	{
-		auto msg = NewI2NPTunnelMessage (false);
-		msg->Concat (buf, i2p::tunnel::TUNNEL_DATA_MSG_SIZE);
-		msg->FillI2NPMessageHeader (eI2NPTunnelData);
+		// 都没有走这里
+		// 调用 NewI2NPTunnelMessage 函数，创建一个新的 I2NP 隧道消息
+		// 参数为 false，表示创建的是非终端的隧道消息
+		auto msg = NewI2NPTunnelMessage(false);
+
+		// 将传入的缓冲区（buf）中的数据追加到消息对象中
+		// 追加的数据大小为 TUNNEL_DATA_MSG_SIZE，表示隧道数据消息的固定大小
+		msg->Concat(buf, i2p::tunnel::TUNNEL_DATA_MSG_SIZE);
+
+		// 为消息填充 I2NP 消息头，类型为隧道数据 (eI2NPTunnelData)
+		msg->FillI2NPMessageHeader(eI2NPTunnelData);
+
+		// 返回准备好的隧道数据消息对象
 		return msg;
 	}
 
+
 	std::shared_ptr<I2NPMessage> CreateTunnelDataMsg (uint32_t tunnelID, const uint8_t * payload)
 	{
-		auto msg = NewI2NPTunnelMessage (false);
-		htobe32buf (msg->GetPayload (), tunnelID);
-		msg->len += 4; // tunnelID
-		msg->Concat (payload, i2p::tunnel::TUNNEL_DATA_MSG_SIZE - 4);
-		msg->FillI2NPMessageHeader (eI2NPTunnelData);
+		// 都没有走这里
+		// 调用 NewI2NPTunnelMessage 函数，创建一个新的 I2NP 隧道消息
+		// 参数为 false，表示创建的是非终端的隧道消息
+		auto msg = NewI2NPTunnelMessage(false);
+
+		// 将传入的 32 位隧道 ID 转换为大端序，并写入消息的有效载荷 (payload) 中
+		htobe32buf(msg->GetPayload(), tunnelID);
+
+		// 增加消息的长度 4 字节，用于隧道 ID
+		msg->len += 4;
+
+		// 将传入的有效负载 (payload) 的内容追加到消息中
+		// 因为隧道 ID 占用了 4 字节，所以剩余的空间是 TUNNEL_DATA_MSG_SIZE - 4
+		msg->Concat(payload, i2p::tunnel::TUNNEL_DATA_MSG_SIZE - 4);
+
+		// 为消息填充 I2NP 消息头，类型为隧道数据 (eI2NPTunnelData)
+		msg->FillI2NPMessageHeader(eI2NPTunnelData);
+
+		// 返回准备好的隧道数据消息对象
 		return msg;
 	}
+
 
 	std::shared_ptr<I2NPMessage> CreateEmptyTunnelDataMsg (bool endpoint)
 	{

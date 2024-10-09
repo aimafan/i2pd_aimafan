@@ -13,6 +13,7 @@
 #include "RouterContext.h"
 #include "Transports.h"
 #include "TunnelGateway.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -218,20 +219,36 @@ namespace tunnel
 			m_Buffer.PutI2NPMsg (block);
 	}
 
+	// 这里应该是层层加密的地方
 	void TunnelGateway::SendBuffer ()
 	{
+		// 完成当前的隧道数据消息，可能是将其标记为已发送或处理。
 		m_Buffer.CompleteCurrentTunnelDataMessage ();
-		std::vector<std::shared_ptr<I2NPMessage> > newTunnelMsgs;
+
+		// 创建一个存储新的隧道消息的向量
+		std::vector<std::shared_ptr<I2NPMessage>> newTunnelMsgs;
+
+		// 获取当前缓冲区中的隧道数据消息
 		const auto& tunnelDataMsgs = m_Buffer.GetTunnelDataMsgs ();
+
+		// 遍历每个隧道数据消息
 		for (auto& tunnelMsg : tunnelDataMsgs)
 		{
+			// 创建一个新的空的隧道数据消息，参数为 false，可能表示该消息不是原始消息
 			auto newMsg = CreateEmptyTunnelDataMsg (false);
+
+			// 使用当前隧道加密原始隧道消息，并将结果存储到新消息中
 			m_Tunnel->EncryptTunnelMsg (tunnelMsg, newMsg);
+
+			// 将新消息的有效负载转换为网络字节序，并设置为下一个隧道ID
 			htobe32buf (newMsg->GetPayload (), m_Tunnel->GetNextTunnelID ());
+
+			// 填充新消息的I2NP消息头，消息类型为 eI2NPTunnelData
 			newMsg->FillI2NPMessageHeader (eI2NPTunnelData);
 			if (tunnelMsg->onDrop) newMsg->onDrop = tunnelMsg->onDrop;
 			newTunnelMsgs.push_back (newMsg);
 			m_NumSentBytes += TUNNEL_DATA_MSG_SIZE;
+			LogToFile("我目前要发送数据的长度是，我作为网关；" + std::to_string(newMsg->GetLength()));
 		}
 		m_Buffer.ClearTunnelDataMsgs ();
 		i2p::transport::transports.SendMessages (m_Tunnel->GetNextIdentHash (), newTunnelMsgs);

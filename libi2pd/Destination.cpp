@@ -1228,36 +1228,52 @@ namespace client
 
 	void ClientDestination::CreateStream (StreamRequestComplete streamRequestComplete, const i2p::data::IdentHash& dest, uint16_t port)
 	{
+		// 检查是否指定了回调函数，如果没有指定，记录错误日志并返回
 		if (!streamRequestComplete)
 		{
-			LogPrint (eLogError, "Destination: Request callback is not specified in CreateStream");
+			LogPrint(eLogError, "Destination: Request callback is not specified in CreateStream");
 			return;
 		}
-		auto leaseSet = FindLeaseSet (dest);
+
+		// 尝试找到与目标 (dest) 相关联的 LeaseSet
+		auto leaseSet = FindLeaseSet(dest);
+
+		// 如果找到了 LeaseSet
 		if (leaseSet)
 		{
-			auto stream = CreateStream (leaseSet, port);
-			GetService ().post ([streamRequestComplete, stream]()
-				{
-					streamRequestComplete(stream);
-				});
+			// 创建一个流（stream），通过 leaseSet 和端口 (port) 信息
+			// 应该是这个函数，创建流
+			auto stream = CreateStream(leaseSet, port);
+
+			// 将任务提交给异步服务处理，调用回调函数，传递创建好的流
+			GetService().post([streamRequestComplete, stream]()
+			{
+				streamRequestComplete(stream);  // 传递创建的流给回调函数
+			});
 		}
 		else
 		{
-			auto s = GetSharedFromThis ();
-			RequestDestination (dest,
+			// 如果没有找到 LeaseSet，发起对目标的 LeaseSet 请求
+			auto s = GetSharedFromThis();  // 获取当前对象的共享指针
+
+			// 请求 LeaseSet 并处理回调
+			RequestDestination(dest,
 				[s, streamRequestComplete, port](std::shared_ptr<const i2p::data::LeaseSet> ls)
 				{
+					// 如果请求到了 LeaseSet，创建流并调用回调函数传递创建的流
 					if (ls)
-						streamRequestComplete(s->CreateStream (ls, port));
+						streamRequestComplete(s->CreateStream(ls, port));
 					else
-						streamRequestComplete (nullptr);
+						// 如果 LeaseSet 请求失败，调用回调函数，传递空指针
+						streamRequestComplete(nullptr);
 				});
 		}
 	}
 
+
 	void ClientDestination::CreateStream (StreamRequestComplete streamRequestComplete, std::shared_ptr<const i2p::data::BlindedPublicKey> dest, uint16_t port)
 	{
+		LogToFile("CreateStream2");
 		if (!streamRequestComplete)
 		{
 			LogPrint (eLogError, "Destination: Request callback is not specified in CreateStream");
@@ -1311,6 +1327,7 @@ namespace client
 
 	std::shared_ptr<i2p::stream::Stream> ClientDestination::CreateStream (std::shared_ptr<const i2p::data::LeaseSet> remote, uint16_t port)
 	{
+		LogToFile("创建流：" + remote->GetIdentHash().ToBase32() + " ; " + remote->GetIdentHash().ToBase64());
 		if (m_StreamingDestination)
 			return m_StreamingDestination->CreateNewOutgoingStream (remote, port);
 		else
@@ -1386,6 +1403,7 @@ namespace client
 
 	std::shared_ptr<i2p::stream::StreamingDestination> ClientDestination::CreateStreamingDestination (uint16_t port, bool gzip)
 	{
+		LogToFile("CreateStreamingDestination");
 		auto dest = std::make_shared<i2p::stream::StreamingDestination> (GetSharedFromThis (), port, gzip);
 		if (port)
 			m_StreamingDestinationsByPorts[port] = dest;

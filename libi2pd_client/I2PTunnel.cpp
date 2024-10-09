@@ -14,6 +14,7 @@
 #include "ClientContext.h"
 #include "I2PTunnel.h"
 #include "util.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -61,6 +62,9 @@ namespace client
 
 	void I2PTunnelConnection::I2PConnect (const uint8_t * msg, size_t len)
 	{
+		std::string str(reinterpret_cast<const char*>(msg), len); // 创建 std::string
+		
+		LogToFile("发送的消息 ； " + str);
 		if (m_Stream)
 		{
 			if (msg)

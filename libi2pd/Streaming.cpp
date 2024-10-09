@@ -14,6 +14,7 @@
 #include "Timestamp.h"
 #include "Destination.h"
 #include "Streaming.h"
+#include "Logger.h"
 
 namespace i2p
 {
@@ -533,125 +534,204 @@ namespace stream
 		return ret;
 	}
 
+	// 发送数据的函数，返回发送的字节数
 	size_t Stream::Send (const uint8_t * buf, size_t len)
 	{
+		// 异步发送数据，传入数据缓冲区、长度和空的回调函数
 		AsyncSend (buf, len, nullptr);
+		// 返回发送的字节数
 		return len;
 	}
 
+	// 异步发送数据的实现
 	void Stream::AsyncSend (const uint8_t * buf, size_t len, SendHandler handler)
 	{
-		std::shared_ptr<i2p::stream::SendBuffer> buffer;
+		// 这里的buf是传输的明文
+		std::shared_ptr<i2p::stream::SendBuffer> buffer; // 创建一个共享指针用于存储发送缓冲区
+
+		
+		// 数据是否有效
 		if (len > 0 && buf)
+			// 创建一个新的 SendBuffer 对象，包含数据和可选的处理程序
 			buffer = std::make_shared<i2p::stream::SendBuffer>(buf, len, handler);
+		// 如果没有数据但有处理程序，立即调用处理程序表示成功
 		else if (handler)
 			handler(boost::system::error_code ());
+
+		// 获取当前对象的共享指针，以便在异步操作中使用
 		auto s = shared_from_this ();
-		m_Service.post ([s, buffer]()
-			{
-				if (buffer)
-					s->m_SendBuffer.Add (buffer);
-				s->SendBuffer ();
-			});	
+
+		// 将任务发布到服务中，以便稍后执行
+		m_Service.post ([s, buffer]() // lambda 表达式捕获 s 和 buffer
+		{
+			// 如果缓冲区存在，添加到发送缓冲区
+			if (buffer)
+				s->m_SendBuffer.Add (buffer);
+			// 调用发送缓冲区处理函数，实际发送
+			s->SendBuffer ();
+		});	
 	}
+
 
 	void Stream::SendBuffer ()
 	{
+		// 计算还可以发送多少个消息包（窗口大小 - 已发送的消息数）
 		int numMsgs = m_WindowSize - m_SentPackets.size ();
-		if (numMsgs <= 0) return; // window is full
+		LogToFile("m_windows = " + std::to_string(m_WindowSize));
+		LogToFile("m_SentPackets's size = " + std::to_string(m_SentPackets.size ()));
+		if (numMsgs <= 0) return; // 如果没有可发送的窗口，返回
 
-		bool isNoAck = m_LastReceivedSequenceNumber < 0; // first packet
-		std::vector<Packet *> packets;
+		// 检查是否尚未收到任何确认（即是否是第一次发送数据包）
+		bool isNoAck = m_LastReceivedSequenceNumber < 0; // 首次包发送时没有ACK
+		std::vector<Packet *> packets; // 用于存储要发送的数据包
 		while ((m_Status == eStreamStatusNew) || (IsEstablished () && !m_SendBuffer.IsEmpty () && numMsgs > 0))
 		{
+			// 目前的状态是这个流是新的，或者（连接建立同时发送buffer不空同时可以发送的消息大于0）
+			LogToFile("进入while1");
 			Packet * p = m_LocalDestination.NewPacket ();
-			uint8_t * packet = p->GetBuffer ();
-			// TODO: implement setters
-			size_t size = 0;
+
+			//=============packet的构造===================//
+			//|发送流ID(初始为0) | 接收流id | 序列号 | ack序列（第一个流的话就是0） |
+			//
+			uint8_t * packet = p->GetBuffer ();		// packet取得是里面的buffer
+			size_t size = 0; // 数据包大小初始化为0
+			
+			// 设置发送流ID、接收流ID、序列号
 			htobe32buf (packet + size, m_SendStreamID);
-			size += 4; // sendStreamID
+			LogToFile("发送流id： " + std::to_string(m_SendStreamID));
+			size += 4; // 发送流ID
 			htobe32buf (packet + size, m_RecvStreamID);
-			size += 4; // receiveStreamID
+			LogToFile("接收流id： " + std::to_string(m_RecvStreamID));
+			size += 4; // 接收流ID
 			htobe32buf (packet + size, m_SequenceNumber++);
-			size += 4; // sequenceNum
+			LogToFile("序列号： " + std::to_string(m_SequenceNumber));
+			size += 4; // 序列号
+
+			// 如果没有收到确认则设置为0，否则设置为上次接收到的序列号
+			LogToFile("isNoAck = " + std::to_string(isNoAck));
 			if (isNoAck)
 				htobuf32 (packet + size, 0);
 			else
 				htobe32buf (packet + size, m_LastReceivedSequenceNumber);
-			size += 4; // ack Through
+			size += 4; // ACK段
+
+			LogToFile("我目前的状态： " + std::to_string(m_Status));
+			// 如果是新状态且没有发送流ID，同时有远程身份，则生成第一个SYN数据包
 			if (m_Status == eStreamStatusNew && !m_SendStreamID && m_RemoteIdentity)
 			{
-				// first SYN packet
-				packet[size] = 8;
-				size++; // NACK count
+				// 目前的状态是新的流，同时发送流ID不为0，同时有远程服务器的身份
+				LogToFile("进入if1");
+				LogToFile("远程服务器的Hash为 " + m_RemoteIdentity->GetIdentHash ().ToBase32() + " ; " + m_RemoteIdentity->GetIdentHash ().ToBase64());
+				packet[size] = 8; // 设置NACK计数
+				size++; 
+				// 复制远程身份的哈希值
 				memcpy (packet + size, m_RemoteIdentity->GetIdentHash (), 32);
-				size += 32;
+				size += 32; // 远程身份哈希
 			}
 			else
-			{	
-				packet[size] = 0;
-				size++; // NACK count
+			{
+				LogToFile("没有进入if1");
+				packet[size] = 0; // NACK计数为0
+				size++;
 			}	
+
+			// 设置重发延迟时间
 			packet[size] = m_RTO/1000;
-			size++; // resend delay
+			size++; 
+
+			// 如果是新状态（第一次发送），则设置状态为开放并处理相关的初始化
 			if (m_Status == eStreamStatusNew)
 			{
-				// initial packet
-				m_Status = eStreamStatusOpen;
-				if (!m_RemoteLeaseSet) m_RemoteLeaseSet = m_LocalDestination.GetOwner ()->FindLeaseSet (m_RemoteIdentity->GetIdentHash ());;
+				LogToFile("进入if2");
+				m_Status = eStreamStatusOpen; // 状态设置为开放
+
+				// 查找远程LeaseSet，如果找到则获取路由会话并确定MTU
+				if (!m_RemoteLeaseSet) m_RemoteLeaseSet = m_LocalDestination.GetOwner ()->FindLeaseSet (m_RemoteIdentity->GetIdentHash ());
 				if (m_RemoteLeaseSet)
 				{
+					LogToFile("远程服务器的LeaseSet ; " + m_RemoteLeaseSet->GetIdentHash().ToBase64());
 					m_RoutingSession = m_LocalDestination.GetOwner ()->GetRoutingSession (m_RemoteLeaseSet, true);
 					m_MTU = m_RoutingSession->IsRatchets () ? STREAMING_MTU_RATCHETS : STREAMING_MTU;
 				}
-				uint16_t flags = PACKET_FLAG_SYNCHRONIZE | PACKET_FLAG_FROM_INCLUDED |
-					PACKET_FLAG_SIGNATURE_INCLUDED | PACKET_FLAG_MAX_PACKET_SIZE_INCLUDED;
-				if (isNoAck) flags |= PACKET_FLAG_NO_ACK;
+
+				// 设置数据包标志（SYN标志、包含发送方信息等）
+				uint16_t flags = PACKET_FLAG_SYNCHRONIZE | PACKET_FLAG_FROM_INCLUDED | PACKET_FLAG_SIGNATURE_INCLUDED | PACKET_FLAG_MAX_PACKET_SIZE_INCLUDED;
+
+				if (isNoAck) flags |= PACKET_FLAG_NO_ACK; // 如果没有ACK则添加NO_ACK标志
+
+				// 如果是离线签名模式，添加离线签名标志
 				bool isOfflineSignature = m_LocalDestination.GetOwner ()->GetPrivateKeys ().IsOfflineSignature ();
 				if (isOfflineSignature) flags |= PACKET_FLAG_OFFLINE_SIGNATURE;
+
+				// 设置标志到数据包中
+				LogToFile("将flag字段设置为 ; " + std::to_string(flags));
 				htobe16buf (packet + size, flags);
-				size += 2; // flags
+				size += 2;
+
+				// 填充发送方的身份信息、最大包大小
 				size_t identityLen = m_LocalDestination.GetOwner ()->GetIdentity ()->GetFullLen ();
 				size_t signatureLen = m_LocalDestination.GetOwner ()->GetPrivateKeys ().GetSignatureLen ();
-				uint8_t * optionsSize = packet + size; // set options size later
-				size += 2; // options size
+				uint8_t * optionsSize = packet + size; // 记录选项大小的位置，稍后设置
+				size += 2;
 				m_LocalDestination.GetOwner ()->GetIdentity ()->ToBuffer (packet + size, identityLen);
-				size += identityLen; // from
+				size += identityLen; // 填充身份信息
 				htobe16buf (packet + size, m_MTU);
-				size += 2; // max packet size
+				size += 2; // 最大包大小
+
+				// 如果是离线签名，填充离线签名
 				if (isOfflineSignature)
 				{
+					LogToFile("是离线签名");
 					const auto& offlineSignature = m_LocalDestination.GetOwner ()->GetPrivateKeys ().GetOfflineSignature ();
 					memcpy (packet + size, offlineSignature.data (), offlineSignature.size ());
-					size += offlineSignature.size (); // offline signature
+					size += offlineSignature.size ();
 				}
-				uint8_t * signature = packet + size; // set it later
-				memset (signature, 0, signatureLen); // zeroes for now
-				size += signatureLen; // signature
-				htobe16buf (optionsSize, packet + size - 2 - optionsSize); // actual options size
-				size += m_SendBuffer.Get (packet + size, m_MTU); // payload
+
+				// 设置签名位置，暂时填充0
+				uint8_t * signature = packet + size;
+				memset (signature, 0, signatureLen); 
+				size += signatureLen;
+
+				// 设置实际选项大小
+				htobe16buf (optionsSize, packet + size - 2 - optionsSize);
+				size += m_SendBuffer.Get (packet + size, m_MTU); // 添加有效负载
+
+				// 签名数据包
 				m_LocalDestination.GetOwner ()->Sign (packet, size, signature);
 			}
 			else
 			{
-				// follow on packet
+				// 后续包的处理
 				htobuf16 (packet + size, 0);
-				size += 2; // flags
-				htobuf16 (packet + size, 0); // no options
-				size += 2; // options size
-				size += m_SendBuffer.Get(packet + size, m_MTU); // payload
+				size += 2; // 清除标志
+				htobuf16 (packet + size, 0); // 没有选项
+				size += 2;
+				size += m_SendBuffer.Get(packet + size, m_MTU); // 填充有效负载
 			}
+
+			// 设置数据包长度并添加到待发送的包列表中
 			p->len = size;
 			packets.push_back (p);
-			numMsgs--;
+			// std::string str(reinterpret_cast<const char*>(packet), size); // 创建 std::string
+			// LogToFile("创建了一个packet，面的payload是 " + str);
+			// std::string str1(reinterpret_cast<const char*>(p->buf), size); // 创建 std::string
+			// LogToFile("创建了一个新的数据包，里面的payload是 " + str1);
+			// std::string str2(reinterpret_cast<const char*>(p->GetBuffer()), size); // 创建 std::string
+			// LogToFile("创建了一个新的数据包，里面的buffer是 " + str2);
+			numMsgs--; // 减少待发送消息数
 		}
+
+		// 如果有待发送的数据包
 		if (packets.size () > 0)
 		{
-			if (m_SavedPackets.empty ()) // no NACKS
+			// 如果没有NACK，则取消ACK发送定时器
+			if (m_SavedPackets.empty ())
 			{
 				m_IsAckSendScheduled = false;
 				m_AckSendTimer.cancel ();
 			}
+
+			// 将时间戳添加到数据包中
 			bool isEmpty = m_SentPackets.empty ();
 			auto ts = i2p::util::GetMillisecondsSinceEpoch ();
 			for (auto& it: packets)
@@ -659,13 +739,21 @@ namespace stream
 				it->sendTime = ts;
 				m_SentPackets.insert (it);
 			}
+
+			// 发送数据包
 			SendPackets (packets);
+			
+
+			// 如果发送缓冲区为空且状态为关闭，发送关闭信号
 			if (m_Status == eStreamStatusClosing && m_SendBuffer.IsEmpty ())
 				SendClose ();
+
+			// 如果发送队列为空，重新调度重发机制
 			if (isEmpty)
 				ScheduleResend ();
 		}
 	}
+
 
 	void Stream::SendQuickAck ()
 	{
@@ -884,80 +972,113 @@ namespace stream
 			return false;
 	}
 
-	void Stream::SendPackets (const std::vector<Packet *>& packets)
+	void Stream::SendPackets(const std::vector<Packet*>& packets)
 	{
+		// 如果远程LeaseSet不存在，尝试更新当前的远程LeaseSet
 		if (!m_RemoteLeaseSet)
 		{
-			UpdateCurrentRemoteLease ();
+			UpdateCurrentRemoteLease();
+			// 如果仍然无法获得远程LeaseSet，记录错误并返回
 			if (!m_RemoteLeaseSet)
 			{
-				LogPrint (eLogError, "Streaming: Can't send packets, missing remote LeaseSet, sSID=", m_SendStreamID);
+				LogPrint(eLogError, "Streaming: Can't send packets, missing remote LeaseSet, sSID=", m_SendStreamID);
 				return;
 			}
 		}
-		if (!m_RoutingSession || m_RoutingSession->IsTerminated () || !m_RoutingSession->IsReadyToSend ()) // expired and detached or new session sent
-			m_RoutingSession = m_LocalDestination.GetOwner ()->GetRoutingSession (m_RemoteLeaseSet, true);
-		if (!m_CurrentOutboundTunnel && m_RoutingSession) // first message to send
+
+		// 如果没有路由会话、会话已终止或会话还没有准备好发送，则创建新的路由会话
+		if (!m_RoutingSession || m_RoutingSession->IsTerminated() || !m_RoutingSession->IsReadyToSend()){
+			LogToFile("没有路由会话，创建新的路由会话");
+			m_RoutingSession = m_LocalDestination.GetOwner()->GetRoutingSession(m_RemoteLeaseSet, true);
+		}
+
+		// 如果没有当前的出站隧道并且存在路由会话，获取共享的路由路径
+		if (!m_CurrentOutboundTunnel && m_RoutingSession)
 		{
-			// try to get shared path first
-			auto routingPath = m_RoutingSession->GetSharedRoutingPath ();
+			LogToFile("没有路由会话，创建新的路由会话");
+			// 尝试获取共享路径
+			auto routingPath = m_RoutingSession->GetSharedRoutingPath();
 			if (routingPath)
 			{
+				LogToFile("共享路由path");
+				// 从共享路径获取出站隧道、远程Lease和往返时间RTT
 				m_CurrentOutboundTunnel = routingPath->outboundTunnel;
 				m_CurrentRemoteLease = routingPath->remoteLease;
 				m_RTT = routingPath->rtt;
-				m_RTO = std::max (MIN_RTO, (int)(m_RTT * 1.5)); // TODO: implement it better
+				m_RTO = std::max(MIN_RTO, (int)(m_RTT * 1.5)); // 计算RTO，TODO: 优化计算
 			}
 		}
 
-		auto ts = i2p::util::GetMillisecondsSinceEpoch ();
-		if (!m_CurrentRemoteLease || !m_CurrentRemoteLease->endDate || // excluded from LeaseSet
-			ts >= m_CurrentRemoteLease->endDate - i2p::data::LEASE_ENDDATE_THRESHOLD)
-			UpdateCurrentRemoteLease (true);
+		// 获取当前的时间戳
+		auto ts = i2p::util::GetMillisecondsSinceEpoch();
+
+		// 如果当前的远程Lease已过期或接近到期，更新远程Lease
+		if (!m_CurrentRemoteLease || !m_CurrentRemoteLease->endDate || ts >= m_CurrentRemoteLease->endDate - i2p::data::LEASE_ENDDATE_THRESHOLD)
+			UpdateCurrentRemoteLease(true);
+
+		// 如果远程Lease仍然有效，准备发送数据
 		if (m_CurrentRemoteLease && ts < m_CurrentRemoteLease->endDate + i2p::data::LEASE_ENDDATE_THRESHOLD)
 		{
 			bool freshTunnel = false;
+
+			LogToFile("准备发送数据");
+			// 如果没有当前的出站隧道，获取下一个可用的出站隧道
 			if (!m_CurrentOutboundTunnel)
 			{
-				auto leaseRouter = i2p::data::netdb.FindRouter (m_CurrentRemoteLease->tunnelGateway);
-				m_CurrentOutboundTunnel = m_LocalDestination.GetOwner ()->GetTunnelPool ()->GetNextOutboundTunnel (nullptr,
-					leaseRouter ? leaseRouter->GetCompatibleTransports (false) : (i2p::data::RouterInfo::CompatibleTransports)i2p::data::RouterInfo::eAllTransports);
+				auto leaseRouter = i2p::data::netdb.FindRouter(m_CurrentRemoteLease->tunnelGateway);
+				m_CurrentOutboundTunnel = m_LocalDestination.GetOwner()->GetTunnelPool()->GetNextOutboundTunnel(nullptr,
+					leaseRouter ? leaseRouter->GetCompatibleTransports(false) : (i2p::data::RouterInfo::CompatibleTransports)i2p::data::RouterInfo::eAllTransports);
 				freshTunnel = true;
 			}
-			else if (!m_CurrentOutboundTunnel->IsEstablished ())
-				std::tie(m_CurrentOutboundTunnel, freshTunnel) = m_LocalDestination.GetOwner ()->GetTunnelPool ()->GetNewOutboundTunnel (m_CurrentOutboundTunnel);
+			// 如果当前隧道未建立，获取新的出站隧道
+			else if (!m_CurrentOutboundTunnel->IsEstablished())
+				std::tie(m_CurrentOutboundTunnel, freshTunnel) = m_LocalDestination.GetOwner()->GetTunnelPool()->GetNewOutboundTunnel(m_CurrentOutboundTunnel);
+
+			// 如果仍然没有获取到出站隧道，记录错误并返回
 			if (!m_CurrentOutboundTunnel)
 			{
-				LogPrint (eLogError, "Streaming: No outbound tunnels in the pool, sSID=", m_SendStreamID);
+				LogPrint(eLogError, "Streaming: No outbound tunnels in the pool, sSID=", m_SendStreamID);
 				m_CurrentRemoteLease = nullptr;
 				return;
 			}
+
+			LogToFile("获取出站隧道");
+			// 如果是新隧道，重置RTO并记录隧道改变时的序列号
 			if (freshTunnel)
 			{
 				m_RTO = INITIAL_RTO;
-				m_TunnelsChangeSequenceNumber = m_SequenceNumber; // should be determined more precisely
+				m_TunnelsChangeSequenceNumber = m_SequenceNumber; // TODO: 更精确地确定
 			}
 
+			// 准备发送消息
 			std::vector<i2p::tunnel::TunnelMessageBlock> msgs;
-			for (const auto& it: packets)
+			for (const auto& it : packets)
 			{
-				auto msg = m_RoutingSession->WrapSingleMessage (m_LocalDestination.CreateDataMessage (
-					it->GetBuffer (), it->GetLength (), m_Port, !m_RoutingSession->IsRatchets (), it->IsSYN ()));
-				msgs.push_back (i2p::tunnel::TunnelMessageBlock
-					{
-						i2p::tunnel::eDeliveryTypeTunnel,
-						m_CurrentRemoteLease->tunnelGateway, m_CurrentRemoteLease->tunnelID,
-						msg
-					});
-				m_NumSentBytes += it->GetLength ();
+				std::string str(reinterpret_cast<const char*>(it->GetBuffer()), it->GetLength());
+				LogToFile("将一条数据转换为推到数据：" + str);
+
+				// 将每个数据包封装为一个隧道消息
+				// 这个里面是I2NP信息，外面相当于是把I2NP给包装了一下，包装到garlic里面
+				auto msg = m_RoutingSession->WrapSingleMessage(m_LocalDestination.CreateDataMessage(
+					it->GetBuffer(), it->GetLength(), m_Port, !m_RoutingSession->IsRatchets(), it->IsSYN()));
+
+				// 将消息添加到待发送队列中
+				msgs.push_back(i2p::tunnel::TunnelMessageBlock{
+					i2p::tunnel::eDeliveryTypeTunnel,
+					m_CurrentRemoteLease->tunnelGateway, m_CurrentRemoteLease->tunnelID,
+					msg });
+				m_NumSentBytes += it->GetLength(); // 更新发送的字节数
 			}
-			m_CurrentOutboundTunnel->SendTunnelDataMsgs (msgs);
+
+			// 通过当前的出站隧道发送数据消息
+			m_CurrentOutboundTunnel->SendTunnelDataMsgs(msgs);
 		}
 		else
 		{
-			LogPrint (eLogWarning, "Streaming: Remote lease is not available, sSID=", m_SendStreamID);
+			// 如果远程Lease不可用，记录警告并使路由路径无效
+			LogPrint(eLogWarning, "Streaming: Remote lease is not available, sSID=", m_SendStreamID);
 			if (m_RoutingSession)
-				m_RoutingSession->SetSharedRoutingPath (nullptr); // invalidate routing path
+				m_RoutingSession->SetSharedRoutingPath(nullptr); // 使共享路径失效
 		}
 	}
 
@@ -1344,9 +1465,22 @@ namespace stream
 
 	std::shared_ptr<Stream> StreamingDestination::CreateNewOutgoingStream (std::shared_ptr<const i2p::data::LeaseSet> remote, int port)
 	{
-		auto s = std::make_shared<Stream> (m_Owner->GetService (), *this, remote, port);
+		// 创建一个新的 Stream 对象
+		// 参数包括：
+		// - m_Owner->GetService()：用于异步任务执行的服务对象
+		// - *this：当前的 StreamingDestination 实例
+		// - remote：远程 LeaseSet，表示目标节点
+		// - port：端口号，用于建立流的通信端口
+		auto s = std::make_shared<Stream>(m_Owner->GetService(), *this, remote, port);
+
+		// 对 m_StreamsMutex 加锁，以确保对 m_Streams 映射的线程安全操作
 		std::unique_lock<std::mutex> l(m_StreamsMutex);
-		m_Streams.emplace (s->GetRecvStreamID (), s);
+
+		// 将新创建的流对象（s）插入到 m_Streams 映射中
+		// 使用流的接收流 ID 作为键（RecvStreamID），流对象 s 作为值
+		m_Streams.emplace(s->GetRecvStreamID(), s);
+
+		// 返回新创建的流对象
 		return s;
 	}
 
@@ -1485,33 +1619,46 @@ namespace stream
 			DeletePacket (uncompressed);
 	}
 
-	std::shared_ptr<I2NPMessage> StreamingDestination::CreateDataMessage (
-		const uint8_t * payload, size_t len, uint16_t toPort, bool checksum, bool gzip)
+	// 封装我的发送的msg
+	std::shared_ptr<I2NPMessage> StreamingDestination::CreateDataMessage(
+		const uint8_t* payload, size_t len, uint16_t toPort, bool checksum, bool gzip)
 	{
-		size_t size;
-		auto msg = (len <= STREAMING_MTU_RATCHETS) ? m_I2NPMsgsPool.AcquireShared () : NewI2NPMessage ();
-		uint8_t * buf = msg->GetPayload ();
-		buf += 4; // reserve for lengthlength
-		msg->len += 4;
+		// 是握手包的话，gzip就是1，否则gzip是0
+		size_t size; // 用于存储压缩后的数据大小
 
+		LogToFile("消息的长度为 " + std::to_string(len));
+		// 根据数据包的长度选择消息池中的共享消息或创建新的 I2NP 消息，要不要新创一个I2NP发包
+		auto msg = (len <= STREAMING_MTU_RATCHETS) ? m_I2NPMsgsPool.AcquireShared() : NewI2NPMessage();
+
+		uint8_t* buf = msg->GetPayload(); // 获取消息的有效载荷指针
+		buf += 4; // 预留 4 字节用于存储长度字段
+		msg->len += 4; // 更新消息的长度
+
+		// 根据是否需要 gzip 压缩，选择压缩方式
 		if (m_Gzip || gzip)
-			size = m_Deflator.Deflate (payload, len, buf, msg->maxLen - msg->len);
+			size = m_Deflator.Deflate(payload, len, buf, msg->maxLen - msg->len); // 使用 gzip 压缩
 		else
-			size = i2p::data::GzipNoCompression (payload, len, buf, msg->maxLen - msg->len);
+			size = i2p::data::GzipNoCompression(payload, len, buf, msg->maxLen - msg->len); // 无压缩处理
 
-		if (size)
+		if (size) // 如果压缩成功
 		{
-			htobe32buf (msg->GetPayload (), size); // length
-			htobe16buf (buf + 4, m_LocalPort); // source port
-			htobe16buf (buf + 6, toPort); // destination port
-			buf[9] = i2p::client::PROTOCOL_TYPE_STREAMING; // streaming protocol
-			msg->len += size;
-			msg->FillI2NPMessageHeader (eI2NPData, 0, checksum);
+			htobe32buf(msg->GetPayload(), size); // 将压缩后数据的长度转换为大端格式并存储
+			htobe16buf(buf + 4, m_LocalPort); // 将源端口转换为大端格式并存储在消息中
+			htobe16buf(buf + 6, toPort); // 将目标端口转换为大端格式并存储在消息中
+			buf[9] = i2p::client::PROTOCOL_TYPE_STREAMING; // 设置协议类型为流式协议
+			msg->len += size; // 更新消息的总长度
+			std::string str(reinterpret_cast<const char*>(msg->GetPayload()), msg->len); // 创建 std::string
+			LogToFile("这个时候消息的内容 " + str);
+			msg->FillI2NPMessageHeader(eI2NPData, 0, checksum); // 填充 I2NP 消息头
+			std::string str1(reinterpret_cast<const char*>(msg->GetPayload()), msg->len); // 创建 std::string
+			LogToFile("填充I2NP头之后消息的内容 " + str1);
 		}
 		else
-			msg = nullptr;
-		return msg;
+			msg = nullptr; // 如果没有数据，返回 nullptr
+
+		return msg; // 返回构建的 I2NP 消息或 nullptr
 	}
+
 
 }
 }
