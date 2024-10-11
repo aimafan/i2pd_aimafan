@@ -15,8 +15,40 @@
 #include "Config.h"
 #include "HTTP.h"
 #include "util.h"
+#include "Logger.h"
 
 using namespace i2p::data;
+
+
+std::string getMessageType(int code) {
+    // 定义数字和字符串的映射关系
+    std::map<int, std::string> messageTypes = {
+        {1, "DatabaseStore"},
+        {2, "DatabaseLookup"},
+        {3, "DatabaseSearchReply"},
+        {0, "DummyMsg"},
+        {20, "I2NPData"},
+        {10, "DeliveryStatus"},
+        {231, "TunnelTest"},
+        {26, "ShortTunnelBuildReply"},
+        {18, "TunnelData"},
+        {19, "TunnelGateway"},
+        {11, "Garlic"},
+        {21, "TunnelBuild"},
+        {23, "VariableTunnelBuild"},
+        {25, "ShortTunnelBuild"},
+        {24, "VariableTunnelBuildReply"},
+        {22, "TunnelBuildReply"}
+    };
+
+    // 查找并返回对应的字符串，如果未找到则返回 "Unknown"
+    auto it = messageTypes.find(code);
+    if (it != messageTypes.end()) {
+        return it->second;
+    } else {
+        return "Unknown";
+    }
+}
 
 namespace i2p
 {
@@ -443,171 +475,225 @@ namespace transport
 
 	void Transports::SendMessages (const i2p::data::IdentHash& ident, const std::vector<std::shared_ptr<i2p::I2NPMessage> >& msgs)
 	{
+		// 将目前的任务推送到m_Service
+		// LogToFile("将PostMessages函数推到到m_Service，目标主机的身份是 " + ident.ToBase32());
 		m_Service->post (std::bind (&Transports::PostMessages, this, ident, msgs));
 	}
 
 	void Transports::PostMessages (i2p::data::IdentHash ident, std::vector<std::shared_ptr<i2p::I2NPMessage> > msgs)
 	{
-		if (ident == i2p::context.GetRouterInfo ().GetIdentHash ())
+		// 如果消息是发给自己的
+		if (ident == i2p::context.GetRouterInfo().GetIdentHash())
 		{
-			// we send it to ourself
+			// 将消息发送给自己
 			for (auto& it: msgs)
-				m_LoopbackHandler.PutNextMessage (std::move (it));
-			m_LoopbackHandler.Flush ();
+			{
+				std::string size = std::to_string(it->GetLength());   // 获取消息长度
+				std::string host = it->GetIP();                       // 获取消息IP
+				std::string port = it->GetPort();                     // 获取消息端口
+				std::string msg_type = std::to_string(it->GetTypeID());// 获取消息类型ID
+				LogToFile("发给自己的：size = " + size + " ; host = " + host + " ; port = " + port + " ; msg_type = " + msg_type);
+				m_LoopbackHandler.PutNextMessage(std::move(it));      // 处理消息
+			}
+			m_LoopbackHandler.Flush();   // 刷新消息处理
 			return;
 		}
+		
+		// 如果路由被限制，且目标路由不是受限的对等方，则直接返回
 		if(RoutesRestricted() && !IsRestrictedPeer(ident)) return;
+
 		std::shared_ptr<Peer> peer;
-		auto it = m_Peers.find (ident);
-		if (it == m_Peers.end ())
+		// 查找是否已经存在对应的对等方
+		auto it = m_Peers.find(ident);
+		if (it == m_Peers.end())
 		{
-			// check if not banned
-			if (i2p::data::IsRouterBanned (ident)) return; // don't create peer to unreachable router
-			// try to connect
+			// 检查目标路由是否被封禁
+			if (i2p::data::IsRouterBanned(ident)) return;  // 如果被封禁，直接返回，不创建对等方
+			
+			// 尝试连接
 			bool connected = false;
 			try
 			{
-				auto r = netdb.FindRouter (ident);
-				if (r && (r->IsUnreachable () || !r->IsReachableFrom (i2p::context.GetRouterInfo ()))) return; // router found but non-reachable
+				auto r = netdb.FindRouter(ident);  // 查找目标路由信息
+				// 如果路由存在但不可到达，直接返回
+				if (r && (r->IsUnreachable() || !r->IsReachableFrom(i2p::context.GetRouterInfo()))) return;
+
 				{
-					auto ts = i2p::util::GetSecondsSinceEpoch ();
+					// 创建新的对等方
+					auto ts = i2p::util::GetSecondsSinceEpoch();
 					peer = std::make_shared<Peer>(r, ts);
 					std::unique_lock<std::mutex> l(m_PeersMutex);
-					peer = m_Peers.emplace (ident, peer).first->second;
+					peer = m_Peers.emplace(ident, peer).first->second;  // 将新对等方加入到对等方列表中
 				}
+
 				if (peer)
-					connected = ConnectToPeer (ident, peer);
+					connected = ConnectToPeer(ident, peer);  // 连接到对等方
 			}
 			catch (std::exception& ex)
 			{
-				LogPrint (eLogError, "Transports: PostMessages exception:", ex.what ());
+				// 捕获异常并记录日志
+				LogPrint(eLogError, "Transports: PostMessages exception:", ex.what());
 			}
-			if (!connected) return;
+
+			if (!connected) return;  // 如果未能成功连接，直接返回
 		}
 		else
+		{
+			// 对等方已存在，直接获取
 			peer = it->second;
-		
+		}
+
+		// 如果没有对等方，直接返回
 		if (!peer) return;
-		if (peer->IsConnected ())
-			peer->sessions.front ()->SendI2NPMessages (msgs);
+
+		// 如果对等方已经连接，发送I2NP消息
+		if (peer->IsConnected())
+		{
+			peer->sessions.front()->SendI2NPMessages(msgs);
+		}
 		else
 		{
-			auto sz = peer->delayedMessages.size (); 	
+			// 对等方未连接，缓存延迟消息
+			auto sz = peer->delayedMessages.size();  // 获取延迟消息队列大小
 			if (sz < MAX_NUM_DELAYED_MESSAGES)
 			{
-				if (sz < CHECK_PROFILE_NUM_DELAYED_MESSAGES && sz + msgs.size () >= CHECK_PROFILE_NUM_DELAYED_MESSAGES)
+				// 如果延迟消息数目超过了设定的检查阈值
+				if (sz < CHECK_PROFILE_NUM_DELAYED_MESSAGES && sz + msgs.size() >= CHECK_PROFILE_NUM_DELAYED_MESSAGES)
 				{
-					if (i2p::data::IsRouterBanned (ident))
+					// 检查路由是否被封禁
+					if (i2p::data::IsRouterBanned(ident))
 					{
-						LogPrint (eLogWarning, "Transports: Router ", ident.ToBase64 (), " is banned. Peer dropped");
+						LogPrint(eLogWarning, "Transports: Router ", ident.ToBase64(), " is banned. Peer dropped");
 						std::unique_lock<std::mutex> l(m_PeersMutex);
-						m_Peers.erase (ident);
+						m_Peers.erase(ident);  // 删除该对等方
 						return;
-					}	
-				}	
+					}
+				}
+
+				// 将消息添加到延迟队列中
 				for (auto& it1: msgs)
+				{
+					// 如果延迟消息队列已经过半且有丢弃回调函数，则提前丢弃
 					if (sz > MAX_NUM_DELAYED_MESSAGES/2 && it1->onDrop)
-						it1->Drop (); // drop earlier because we can handle it
+						it1->Drop();
 					else
-						peer->delayedMessages.push_back (it1);
+						peer->delayedMessages.push_back(it1);
+				}
 			}
 			else
 			{
-				LogPrint (eLogWarning, "Transports: Delayed messages queue size to ",
-					ident.ToBase64 (), " exceeds ", MAX_NUM_DELAYED_MESSAGES);
+				// 延迟消息队列超出限制，记录日志并删除对等方
+				LogPrint(eLogWarning, "Transports: Delayed messages queue size to ", ident.ToBase64(), " exceeds ", MAX_NUM_DELAYED_MESSAGES);
 				std::unique_lock<std::mutex> l(m_PeersMutex);
-				m_Peers.erase (ident);
+				m_Peers.erase(ident);
 			}
 		}
 	}
 
 	bool Transports::ConnectToPeer (const i2p::data::IdentHash& ident, std::shared_ptr<Peer> peer)
 	{
-		if (!peer->router) // reconnect
-			peer->SetRouter (netdb.FindRouter (ident)); // try to get new one from netdb
-		if (peer->router) // we have RI already
+		// 如果对等方没有路由器信息（可能是重新连接），从网络数据库中查找并设置
+		if (!peer->router)
+			peer->SetRouter(netdb.FindRouter(ident)); // 尝试从netdb中获取新的路由器信息
+
+		// 如果对等方已有路由器信息
+		if (peer->router)
 		{
-			if (peer->priority.empty ())
-				SetPriority (peer);
-			while (peer->numAttempts < (int)peer->priority.size ())
+			// 如果优先级为空，设置优先级
+			if (peer->priority.empty())
+				SetPriority(peer);
+
+			// 尝试使用优先级列表中的不同传输类型进行连接
+			while (peer->numAttempts < (int)peer->priority.size())
 			{
-				auto tr = peer->priority[peer->numAttempts];
-				peer->numAttempts++;
+				auto tr = peer->priority[peer->numAttempts];  // 获取当前尝试的传输类型
+				peer->numAttempts++;  // 增加尝试次数
+
+				// 根据传输类型进行处理
 				switch (tr)
 				{
+					// NTCP2 IPv4/IPv6 类型
 					case i2p::data::RouterInfo::eNTCP2V4:
 					case i2p::data::RouterInfo::eNTCP2V6:
 					{
-						if (!m_NTCP2Server) continue;
+						if (!m_NTCP2Server) continue;  // 如果没有NTCP2服务器，跳过
 						std::shared_ptr<const RouterInfo::Address> address = (tr == i2p::data::RouterInfo::eNTCP2V6) ?
-							peer->router->GetPublishedNTCP2V6Address () : peer->router->GetPublishedNTCP2V4Address ();
-						if (address && IsInReservedRange(address->host))
+							peer->router->GetPublishedNTCP2V6Address() : peer->router->GetPublishedNTCP2V4Address();  // 获取IPv6或IPv4地址
+						if (address && IsInReservedRange(address->host))  // 如果地址在保留范围内，忽略
 							address = nullptr;
-						if (address)
+						if (address)  // 如果有有效地址
 						{
-							auto s = std::make_shared<NTCP2Session> (*m_NTCP2Server, peer->router, address);
-							if( m_NTCP2Server->UsingProxy())
+							auto s = std::make_shared<NTCP2Session>(*m_NTCP2Server, peer->router, address);  // 创建NTCP2会话
+							if (m_NTCP2Server->UsingProxy())  // 如果使用代理，使用代理连接
 								m_NTCP2Server->ConnectWithProxy(s);
-							else
-								m_NTCP2Server->Connect (s);
-							return true;
+							else  // 否则直接连接
+								m_NTCP2Server->Connect(s);
+							return true;  // 成功连接，返回true
 						}
 						break;
 					}
+
+					// SSU2 IPv4/IPv6 类型
 					case i2p::data::RouterInfo::eSSU2V4:
 					case i2p::data::RouterInfo::eSSU2V6:
 					{
-						if (!m_SSU2Server) continue;
+						if (!m_SSU2Server) continue;  // 如果没有SSU2服务器，跳过
 						std::shared_ptr<const RouterInfo::Address> address = (tr == i2p::data::RouterInfo::eSSU2V6) ?
-							peer->router->GetSSU2V6Address () : peer->router->GetSSU2V4Address ();
-						if (address && IsInReservedRange(address->host))
+							peer->router->GetSSU2V6Address() : peer->router->GetSSU2V4Address();  // 获取IPv6或IPv4地址
+						if (address && IsInReservedRange(address->host))  // 如果地址在保留范围内，忽略
 							address = nullptr;
-						if (address && address->IsReachableSSU ())
+						if (address && address->IsReachableSSU())  // 如果地址可通过SSU到达
 						{
-							if (m_SSU2Server->CreateSession (peer->router, address))
-								return true;
+							if (m_SSU2Server->CreateSession(peer->router, address))  // 创建SSU2会话
+								return true;  // 成功创建会话，返回true
 						}
 						break;
 					}
+
+					// NTCP2 Mesh 类型
 					case i2p::data::RouterInfo::eNTCP2V6Mesh:
 					{
-						if (!m_NTCP2Server) continue;
-						auto address = peer->router->GetYggdrasilAddress ();
+						if (!m_NTCP2Server) continue;  // 如果没有NTCP2服务器，跳过
+						auto address = peer->router->GetYggdrasilAddress();  // 获取Yggdrasil地址
 						if (address)
 						{
-							auto s = std::make_shared<NTCP2Session> (*m_NTCP2Server, peer->router, address);
-							m_NTCP2Server->Connect (s);
-							return true;
+							auto s = std::make_shared<NTCP2Session>(*m_NTCP2Server, peer->router, address);  // 创建NTCP2会话
+							m_NTCP2Server->Connect(s);  // 连接
+							return true;  // 成功连接，返回true
 						}
 						break;
 					}
+
+					// 未知传输类型，记录错误日志
 					default:
-						LogPrint (eLogError, "Transports: Unknown transport ", (int)tr);
+						LogPrint(eLogError, "Transports: Unknown transport ", (int)tr);
 				}
 			}
 
-			LogPrint (eLogInfo, "Transports: No compatible addresses available");
-			if (peer->router->IsReachableFrom (i2p::context.GetRouterInfo ()))
-				i2p::data::netdb.SetUnreachable (ident, true); // we are here because all connection attempts failed but router claimed them
-			peer->Done ();
+			// 如果没有兼容的地址，记录信息并处理
+			LogPrint(eLogInfo, "Transports: No compatible addresses available");
+			if (peer->router->IsReachableFrom(i2p::context.GetRouterInfo()))  // 如果路由器声明可到达，但连接失败
+				i2p::data::netdb.SetUnreachable(ident, true);  // 设置为不可到达
+			peer->Done();  // 标记对等方处理完成
 			std::unique_lock<std::mutex> l(m_PeersMutex);
-			m_Peers.erase (ident);
-			return false;
+			m_Peers.erase(ident);  // 从对等方列表中移除
+			return false;  // 连接失败，返回false
 		}
-		else if (i2p::data::IsRouterBanned (ident))
+		else if (i2p::data::IsRouterBanned(ident))  // 如果路由器被封禁
 		{
-			LogPrint (eLogWarning, "Transports: Router ", ident.ToBase64 (), " is banned. Peer dropped");
-			peer->Done ();
+			LogPrint(eLogWarning, "Transports: Router ", ident.ToBase64(), " is banned. Peer dropped");
+			peer->Done();  // 标记对等方处理完成
 			std::unique_lock<std::mutex> l(m_PeersMutex);
-			m_Peers.erase (ident);
-			return false;
+			m_Peers.erase(ident);  // 从对等方列表中移除
+			return false;  // 返回false
 		}
-		else // otherwise request RI
+		else // 如果没有路由器信息，请求路由器信息
 		{
-			LogPrint (eLogInfo, "Transports: RouterInfo for ", ident.ToBase64 (), " not found, requested");
-			i2p::data::netdb.RequestDestination (ident, std::bind (
-				&Transports::RequestComplete, this, std::placeholders::_1, ident));
+			LogPrint(eLogInfo, "Transports: RouterInfo for ", ident.ToBase64(), " not found, requested");
+			i2p::data::netdb.RequestDestination(ident, std::bind(
+				&Transports::RequestComplete, this, std::placeholders::_1, ident));  // 请求路由器信息并绑定回调函数
 		}
+
 		return true;
 	}
 

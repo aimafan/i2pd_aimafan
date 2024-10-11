@@ -27,6 +27,9 @@
 #include "I2NPProtocol.h"
 #include "Identity.h"
 
+
+std::string getMessageType(int code);
+
 namespace i2p
 {
 namespace transport

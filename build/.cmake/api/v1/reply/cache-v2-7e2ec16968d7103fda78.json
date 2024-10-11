@@ -127,11 +127,11 @@
 			[
 				{
 					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
+					"value" : "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel ..."
 				}
 			],
 			"type" : "STRING",
-			"value" : "Debug"
+			"value" : ""
 		},
 		{
 			"name" : "CMAKE_CACHEFILE_DIR",
@@ -143,7 +143,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/root/Documents/i2pd_link_explorer/build"
+			"value" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -243,11 +243,11 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
+					"value" : "CXX compiler"
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/g++"
+			"value" : "/usr/bin/c++"
 		},
 		{
 			"name" : "CMAKE_CXX_COMPILER_AR",
@@ -371,11 +371,11 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
+					"value" : "C compiler"
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/gcc"
+			"value" : "/usr/bin/cc"
 		},
 		{
 			"name" : "CMAKE_C_COMPILER_AR",
@@ -607,11 +607,11 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
+					"value" : "Enable/Disable output of compile commands during generation."
 				}
 			],
 			"type" : "BOOL",
-			"value" : "TRUE"
+			"value" : ""
 		},
 		{
 			"name" : "CMAKE_EXTRA_GENERATOR",
@@ -635,7 +635,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/root/Documents/i2pd_link_explorer/build/CMakeFiles/pkgRedirects"
+			"value" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -707,7 +707,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/root/Documents/i2pd_link_explorer/build"
+			"value" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build"
 		},
 		{
 			"name" : "CMAKE_INSTALL_BINDIR",
@@ -2475,7 +2475,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/root/Documents/i2pd_link_explorer/build"
+			"value" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build"
 		},
 		{
 			"name" : "i2pd_IS_TOP_LEVEL",
@@ -2499,7 +2499,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/root/Documents/i2pd_link_explorer/build"
+			"value" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build"
 		},
 		{
 			"name" : "pkgcfg_lib__OPENSSL_crypto",

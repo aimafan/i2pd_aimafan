@@ -25,7 +25,37 @@
 #include "util.h"
 #include "ECIESX25519AEADRatchetSession.h"
 #include "Logger.h"
-#include "Logger_transport.h"
+
+
+// std::string getMessageType(int code) {
+//     // 定义数字和字符串的映射关系
+//     std::map<int, std::string> messageTypes = {
+//         {1, "DatabaseStore"},
+//         {2, "DatabaseLookup"},
+//         {3, "DatabaseSearchReply"},
+//         {0, "DummyMsg"},
+//         {20, "I2NPData"},
+//         {10, "DeliveryStatus"},
+//         {231, "TunnelTest"},
+//         {26, "ShortTunnelBuildReply"},
+//         {18, "TunnelData"},
+//         {19, "TunnelGateway"},
+//         {11, "Garlic"},
+//         {21, "TunnelBuild"},
+//         {23, "VariableTunnelBuild"},
+//         {25, "ShortTunnelBuild"},
+//         {24, "VariableTunnelBuildReply"},
+//         {22, "TunnelBuildReply"}
+//     };
+
+//     // 查找并返回对应的字符串，如果未找到则返回 "Unknown"
+//     auto it = messageTypes.find(code);
+//     if (it != messageTypes.end()) {
+//         return it->second;
+//     } else {
+//         return "Unknown";
+//     }
+// }
 
 namespace i2p
 {
@@ -70,10 +100,6 @@ namespace tunnel
 			hop->recordIndex = recordIndicies[i]; i++;
 			hop->CreateBuildRequestRecord (records, msgID);
 			hop = hop->next;
-			// LogToFile("这个hop的tunnel id = " + std::to_string(hop->tunnelID));
-			// LogToFile("这个hop的下一跳的tunnel id = " + std::to_string(hop->nextTunnelID));
-			// LogToFile("这个hop的ident = " + hop->ident->ToBase64());
-			// LogToFile("这个hop的ident = " + hop->nextIdent.ToBase64());
 		}
 		// fill up fake records with random data
 		for (int i = numHops; i < numRecords; i++)
@@ -116,7 +142,6 @@ namespace tunnel
 				}
 			}
 			outboundTunnel->SendTunnelDataMsgTo (GetNextIdentHash (), 0, msg);
-			// LogToFile("顺着出站隧道发送消息，发送消息的目标是：" + GetNextIdentHash().ToBase64());
 		}
 		else
 		{
@@ -131,7 +156,6 @@ namespace tunnel
 				else
 					i2p::context.SubmitECIESx25519Key (key, tag);
 			}
-			// LogToFile("通过i2p传输层发送消息，发送消息的目标是" + GetNextIdentHash().ToBase64());
 			i2p::transport::transports.SendMessage (GetNextIdentHash (), msg);
 		}
 	}
@@ -270,7 +294,6 @@ namespace tunnel
 					n_ident = ident_hash[i];
 					n_tunnel_id = tunnel_id[i];
 				}
-				LogToFile_tran(weizhi + " , "  +  p_ip + " , " + p_port + " , " + p_ident + " , " + p_tunnel_id  + " , " + n_ip + " , " + n_port + " , " + n_ident + " , " + n_tunnel_id);
 			}
 		}
 		if (established) m_State = eTunnelStateEstablished;
@@ -554,65 +577,104 @@ namespace tunnel
 
 	void Tunnels::Run ()
 	{
+		// 设置线程名称为"Tunnels"
 		i2p::util::SetThreadName("Tunnels");
-		std::this_thread::sleep_for (std::chrono::seconds(1)); // wait for other parts are ready
+		
+		// 等待1秒，确保其他模块已准备好
+		std::this_thread::sleep_for (std::chrono::seconds(1)); 
 
+		// 初始化时间戳变量
 		uint64_t lastTs = 0, lastPoolsTs = 0, lastMemoryPoolTs = 0;
+		
+		// 主循环，持续运行直到 m_IsRunning 被设置为 false
 		while (m_IsRunning)
 		{
 			try
 			{
-				// 从队列中以1秒的超时获取下一条消息
+				// 从队列中以1秒的超时时间获取下一条消息
+				// 本质上就是从m_Queue这个队列中取数据
 				auto msg = m_Queue.GetNextWithTimeout (1000); // 1 sec
+				
+				// 如果获取到消息，则处理消息
 				if (msg)
 				{
-					// 初始化变量，用于处理消息和隧道
+
+					// 初始化用于处理消息的变量
 					int numMsgs = 0;
 					uint32_t prevTunnelID = 0, tunnelID = 0;
 					std::shared_ptr<TunnelBase> prevTunnel;
-					// 循环处理批量的隧道消息，直到获取不到更多消息为止
+
+					// 处理批量的隧道消息
 					do
 					{
+						std::string protocal = msg->GetProtocal();
+						std::string size = std::to_string(msg->GetLength());
+						std::string msg_type = getMessageType(msg->GetTypeID());
+						std::string host = msg->GetIP();
+						std::string port = msg->GetPort();
+						std::string my_tunnelID = "";
 						std::shared_ptr<TunnelBase> tunnel;
+						
+						// 获取消息的类型ID
 						uint8_t typeID = msg->GetTypeID ();
+						
+						// 根据消息类型ID进行处理
 						switch (typeID)
 						{
+							// 如果是隧道数据消息或隧道网关消息
 							case eI2NPTunnelData:
 							case eI2NPTunnelGateway:
 							{
+								// 获取消息的隧道ID
 								tunnelID = bufbe32toh (msg->GetPayload ());
+								
+								// 如果隧道ID与前一个相同，使用前一个隧道对象
 								if (tunnelID == prevTunnelID)
 									tunnel = prevTunnel;
 								else if (prevTunnel)
-									prevTunnel->FlushTunnelDataMsgs ();
+									prevTunnel->FlushTunnelDataMsgs (); // 刷新前一个隧道的数据消息
 
+								// 如果当前没有隧道对象，从隧道列表中获取
 								if (!tunnel)
 									tunnel = GetTunnel (tunnelID);
+								
+								// 如果找到隧道，处理隧道数据或网关消息
 								if (tunnel)
 								{
-									if (typeID == eI2NPTunnelData)
-										tunnel->HandleTunnelDataMsg (std::move (msg));
-									else // tunnel gateway assumed
-										HandleTunnelGatewayMsg (tunnel, msg);
+									if (typeID == eI2NPTunnelData){
+										tunnel->HandleTunnelDataMsg (std::move (msg)); // 处理隧道数据消息
+									}
+									else{ // assumed tunnel gateway
+										HandleTunnelGatewayMsg (tunnel, msg); // 处理隧道网关消息
+									}
 								}
 								else
 									LogPrint (eLogWarning, "Tunnel: Tunnel not found, tunnelID=", tunnelID, " previousTunnelID=", prevTunnelID, " type=", (int)typeID);
+								
+								my_tunnelID = std::to_string(tunnelID);
 
 								break;
 							}
+							// 如果是隧道构建消息或回复消息
 							case eI2NPVariableTunnelBuild:
 							case eI2NPVariableTunnelBuildReply:
 							case eI2NPShortTunnelBuild:
 							case eI2NPShortTunnelBuildReply:
 							case eI2NPTunnelBuild:
 							case eI2NPTunnelBuildReply:
-								HandleTunnelBuildI2NPMessage (msg);
+								HandleTunnelBuildI2NPMessage (msg); // 处理隧道构建消息
 							break;
+
+							// 未知的消息类型，记录警告日志
 							default:
 								LogPrint (eLogWarning, "Tunnel: Unexpected message type ", (int) typeID);
 						}
+						// 发/收 ; TCP/UDP ; IP ; 端口 ; TunnelID ; 包类型 ; 包长度 
+						LogToFile("收 ; " + protocal + " ; " + host + " ; " + port + " ; " + my_tunnelID + " ; " + msg_type + " ; " + size);
 
+						// 获取下一条消息进行批量处理
 						msg = (numMsgs <= MAX_TUNNEL_MSGS_BATCH_SIZE) ? m_Queue.Get () : nullptr;
+						
 						if (msg)
 						{
 							prevTunnelID = tunnelID;
@@ -620,41 +682,47 @@ namespace tunnel
 							numMsgs++;
 						}
 						else if (tunnel)
-							tunnel->FlushTunnelDataMsgs ();
+							tunnel->FlushTunnelDataMsgs (); // 刷新当前隧道的数据消息
 					}
 					while (msg);
 				}
 
+				// 如果网络在线，进行隧道和内存池的管理
 				if (i2p::transport::transports.IsOnline())
 				{
-					uint64_t ts = i2p::util::GetSecondsSinceEpoch ();
-					if (ts - lastTs >= TUNNEL_MANAGE_INTERVAL || // manage tunnels every 15 seconds
-					    ts + TUNNEL_MANAGE_INTERVAL < lastTs)
+					uint64_t ts = i2p::util::GetSecondsSinceEpoch (); // 获取当前时间戳
+
+					// 每15秒管理一次隧道
+					if (ts - lastTs >= TUNNEL_MANAGE_INTERVAL || ts + TUNNEL_MANAGE_INTERVAL < lastTs)
 					{
 						ManageTunnels (ts);
 						lastTs = ts;
 					}
-					if (ts - lastPoolsTs >= TUNNEL_POOLS_MANAGE_INTERVAL || // manage pools every 5 seconds
-					    ts + TUNNEL_POOLS_MANAGE_INTERVAL < lastPoolsTs)
+
+					// 每5秒管理一次隧道池
+					if (ts - lastPoolsTs >= TUNNEL_POOLS_MANAGE_INTERVAL || ts + TUNNEL_POOLS_MANAGE_INTERVAL < lastPoolsTs)
 					{
 						ManageTunnelPools (ts);
 						lastPoolsTs = ts;
 					}
-					if (ts - lastMemoryPoolTs >= TUNNEL_MEMORY_POOL_MANAGE_INTERVAL ||
-					    ts + TUNNEL_MEMORY_POOL_MANAGE_INTERVAL < lastMemoryPoolTs) // manage memory pool every 2 minutes
+
+					// 每2分钟管理一次内存池
+					if (ts - lastMemoryPoolTs >= TUNNEL_MEMORY_POOL_MANAGE_INTERVAL || ts + TUNNEL_MEMORY_POOL_MANAGE_INTERVAL < lastMemoryPoolTs)
 					{
-						m_I2NPTunnelEndpointMessagesMemoryPool.CleanUpMt ();
-						m_I2NPTunnelMessagesMemoryPool.CleanUpMt ();
+						m_I2NPTunnelEndpointMessagesMemoryPool.CleanUpMt (); // 清理隧道端点消息内存池
+						m_I2NPTunnelMessagesMemoryPool.CleanUpMt (); // 清理隧道消息内存池
 						lastMemoryPoolTs = ts;
 					}
 				}
 			}
+			// 捕获并记录异常信息
 			catch (std::exception& ex)
 			{
 				LogPrint (eLogError, "Tunnel: Runtime exception: ", ex.what ());
 			}
 		}
 	}
+
 
 	void Tunnels::HandleTunnelGatewayMsg (std::shared_ptr<TunnelBase> tunnel, std::shared_ptr<I2NPMessage> msg)
 	{
@@ -919,6 +987,7 @@ namespace tunnel
 		}
 	}
 
+	// 这边两个函数是往队列里面放数据
 	void Tunnels::PostTunnelData (std::shared_ptr<I2NPMessage> msg)
 	{
 		if (msg) m_Queue.Put (msg);

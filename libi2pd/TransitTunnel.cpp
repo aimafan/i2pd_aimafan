@@ -14,7 +14,6 @@
 #include "Tunnel.h"
 #include "Transports.h"
 #include "TransitTunnel.h"
-#include "Logger_transport.h"
 #include "NetDb.hpp"
 
 namespace i2p
@@ -166,7 +165,6 @@ namespace tunnel
 			n_ident = nextIdent.ToBase64();
 			n_tunnel_id = std::to_string(nextTunnelID);
 		}
-		LogToFile_tran(weizhi + " , "  +  p_ip + " , " + p_port + " , " + p_ident + " , " + p_tunnel_id  + " , " + n_ip + " , " + n_port + " , " + n_ident + " , " + n_tunnel_id);
 
 		// 如果是endpoint，那么nexttunnelid和nexttunnelhash应该都是创建者的某个入站隧道网关的信息
 

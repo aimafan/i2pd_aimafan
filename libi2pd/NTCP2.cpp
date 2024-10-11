@@ -23,7 +23,9 @@
 #include "util.h"
 #include "Socks5.h"
 #include "NTCP2.h"
-#include "Logger_transport.h"
+#include "Logger.h"
+#include "Tunnel.h"
+
 
 #if defined(__linux__) && !defined(_NETINET_IN_H)
 	#include <linux/in6.h>
@@ -971,6 +973,7 @@ namespace transport
 						if(!host.empty()){
 							if(!port.empty()){
 								nextMsg->SetIPandPort(host, port);
+								nextMsg->SetProtocal("NTCP2");
 							}
 						}
 						// 将新消息添加到消息处理队列中，供后续处理
@@ -1150,44 +1153,69 @@ namespace transport
 		}
 	}
 
+	// LogToFile("发 ; " + protocal + " ; " + host + " ; " + port + " ; " + my_tunnelID + " ; " + msg_type + " ; " + size);
 	void NTCP2Session::SendQueue ()
 	{
+		// 如果发送队列不为空，则开始处理队列中的消息
 		if (!m_SendQueue.empty ())
 		{
-			std::vector<std::shared_ptr<I2NPMessage> > msgs;
-			auto ts = i2p::util::GetMillisecondsSinceEpoch ();
-			size_t s = 0;
+			std::vector<std::shared_ptr<I2NPMessage>> msgs; // 用于存储准备发送的消息
+			auto ts = i2p::util::GetMillisecondsSinceEpoch (); // 获取当前时间戳
+			size_t s = 0; // 用于跟踪当前发送的字节数
+
+			// 遍历发送队列，直到队列为空
 			while (!m_SendQueue.empty ())
 			{
-				auto msg = m_SendQueue.front ();
+				auto msg = m_SendQueue.front (); // 获取队列前面的消息
+				// 检查消息是否为null或是否已过期
 				if (!msg || msg->IsExpired (ts))
 				{
-					// drop null or expired message
-					if (msg) msg->Drop ();
-					m_SendQueue.pop_front ();
-					continue;
+					// 丢弃null或已过期的消息
+					if (msg) msg->Drop (); // 调用Drop函数处理消息
+					m_SendQueue.pop_front (); // 从队列中移除该消息
+					continue; // 继续处理下一个消息
 				}	
-				size_t len = msg->GetNTCP2Length ();
+				std::string protocal = "NTCP2";
+				std::string size = std::to_string(msg->GetLength());
+				std::string msg_type = getMessageType(msg->GetTypeID());
+				std::string host =  m_RemoteEndpoint.address().to_string();
+				std::string port = std::to_string(m_RemoteEndpoint.port());
+				std::string ident = m_RemoteIdentity->GetIdentHash().ToBase64();
+				std::string my_tunnelID = "";
+				if(msg_type == "TunnelData" || msg_type == "TunnelGateway"){
+					my_tunnelID = std::to_string(bufbe32toh (msg->GetPayload ()));
+				}
+
+				// 这里的host和port是我想要发送出去的吗，先看看
+				LogToFile("发 ; " + protocal + " ; " + host + " ; " + port + " ; " + ident + " ; " + my_tunnelID + " ; " + msg_type + " ; " + size);
+				
+				size_t len = msg->GetNTCP2Length (); // 获取消息的长度
+				// 检查当前消息是否可以添加到帧中（包括3字节的块头）
 				if (s + len + 3 <= NTCP2_UNENCRYPTED_FRAME_MAX_SIZE) // 3 bytes block header
 				{
-					msgs.push_back (msg);
-					s += (len + 3);
-					m_SendQueue.pop_front ();
+					msgs.push_back (msg); // 将消息添加到待发送的消息列表中
+					s += (len + 3); // 更新当前发送的字节数
+					m_SendQueue.pop_front (); // 从队列中移除该消息
+					// 如果当前字节数达到发送阈值，则立即发送帧
 					if (s >= NTCP2_SEND_AFTER_FRAME_SIZE)
-						break; // send frame right a way
+						break; // 发送帧
 				}
+				// 如果消息长度超出可发送的最大尺寸，记录错误并丢弃消息
 				else if (len + 3 > NTCP2_UNENCRYPTED_FRAME_MAX_SIZE)
 				{
 					LogPrint (eLogError, "NTCP2: I2NP message of size ", len, " can't be sent. Dropped");
-					msg->Drop ();
-					m_SendQueue.pop_front ();
+					msg->Drop (); // 丢弃该消息
+					m_SendQueue.pop_front (); // 从队列中移除该消息
 				}
 				else
-					break;
+					break; // 当前消息无法添加到帧中，退出循环
 			}
+			
+			// 调用SendI2NPMsgs函数发送准备好的消息
 			SendI2NPMsgs (msgs);
 		}
 	}
+
 
 	size_t NTCP2Session::CreatePaddingBlock (size_t msgLen, uint8_t * buf, size_t len)
 	{
@@ -1271,27 +1299,45 @@ namespace transport
 		m_Server.GetService ().post (std::bind (&NTCP2Session::PostI2NPMessages, shared_from_this (), msgs));
 	}
 
+
 	// 该函数将 I2NP 消息发送到 NTCP2 会话的发送队列，关于发送的代码
 	void NTCP2Session::PostI2NPMessages (std::vector<std::shared_ptr<I2NPMessage> > msgs)
 	{
+		// 如果会话已经终止，则直接返回，不处理消息
 		if (m_IsTerminated) return;
-		bool isSemiFull = m_SendQueue.size () > NTCP2_MAX_OUTGOING_QUEUE_SIZE/2;
+
+		// 判断发送队列是否已接近半满（根据NTCP2_MAX_OUTGOING_QUEUE_SIZE）
+		bool isSemiFull = m_SendQueue.size() > NTCP2_MAX_OUTGOING_QUEUE_SIZE / 2;
+
+		// 遍历传入的消息列表
 		for (auto it: msgs)
-			if (isSemiFull && it->onDrop)
-				it->Drop (); // drop earlier because we can handle it
-			else
-				m_SendQueue.push_back (std::move (it));
-		
-		if (!m_IsSending)
-			SendQueue ();
-		else if (m_SendQueue.size () > NTCP2_MAX_OUTGOING_QUEUE_SIZE)
 		{
-			LogPrint (eLogWarning, "NTCP2: Outgoing messages queue size to ",
-				GetIdentHashBase64(), " exceeds ", NTCP2_MAX_OUTGOING_QUEUE_SIZE);
-			Terminate ();
+			// 如果发送队列接近半满，并且消息有onDrop处理函数，则提前丢弃该消息
+			// 这里丢弃消息的具体逻辑是什么样的呢？
+			if (isSemiFull && it->onDrop)
+				it->Drop(); // 提前丢弃消息并调用onDrop回调函数
+			else
+				// 否则将消息加入发送队列
+				m_SendQueue.push_back(std::move(it));
 		}
-		SetSendQueueSize (m_SendQueue.size ());
+
+		// 如果当前没有正在发送消息，则调用SendQueue()函数来处理队列中的消息
+		if (!m_IsSending)
+			SendQueue();
+		// 如果发送队列超过最大允许的大小，记录日志并终止会话
+		else if (m_SendQueue.size() > NTCP2_MAX_OUTGOING_QUEUE_SIZE)
+		{
+			// 记录警告日志，发送队列已超出最大值
+			LogPrint(eLogWarning, "NTCP2: Outgoing messages queue size to ",
+				GetIdentHashBase64(), " exceeds ", NTCP2_MAX_OUTGOING_QUEUE_SIZE);
+			// 终止会话
+			Terminate();
+		}
+
+		// 更新当前发送队列的大小
+		SetSendQueueSize(m_SendQueue.size());
 	}
+
 
 	void NTCP2Session::SendLocalRouterInfo (bool update)
 	{

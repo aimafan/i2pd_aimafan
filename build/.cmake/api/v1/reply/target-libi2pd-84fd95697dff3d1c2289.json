@@ -93,7 +93,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : " -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g"
+					"fragment" : " -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC"
 				}
 			],
 			"defines" : 
@@ -139,19 +139,19 @@
 			[
 				{
 					"backtrace" : 7,
-					"path" : "/root/Documents/i2pd_link_explorer/build/../libi2pd"
+					"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build/../libi2pd"
 				},
 				{
 					"backtrace" : 8,
-					"path" : "/root/Documents/i2pd_link_explorer/build/../libi2pd_client"
+					"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build/../libi2pd_client"
 				},
 				{
 					"backtrace" : 9,
-					"path" : "/root/Documents/i2pd_link_explorer/build/../i18n"
+					"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build/../i18n"
 				},
 				{
 					"backtrace" : 10,
-					"path" : "/root/Documents/i2pd_link_explorer/build/../daemon"
+					"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build/../daemon"
 				}
 			],
 			"language" : "CXX",
@@ -203,8 +203,7 @@
 				43,
 				44,
 				45,
-				46,
-				47
+				46
 			]
 		}
 	],
@@ -282,8 +281,7 @@
 				43,
 				44,
 				45,
-				46,
-				47
+				46
 			]
 		}
 	],
@@ -292,289 +290,283 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Base.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Base.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Blinding.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Blinding.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/CPU.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/CPU.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/ChaCha20.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/ChaCha20.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Config.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Config.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Crypto.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Crypto.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/CryptoKey.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/CryptoKey.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Datagram.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Datagram.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Destination.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Destination.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/ECIESX25519AEADRatchetSession.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/ECIESX25519AEADRatchetSession.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Ed25519.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Ed25519.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Elligator.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Elligator.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/FS.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/FS.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Family.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Family.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Garlic.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Garlic.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Gost.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Gost.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Gzip.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Gzip.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/HTTP.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/HTTP.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/I2NPProtocol.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/I2NPProtocol.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/I2PEndian.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/I2PEndian.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Identity.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Identity.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/KadDHT.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/KadDHT.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/LeaseSet.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/LeaseSet.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Log.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Log.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Logger.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Logger.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Logger_transport.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/NTCP2.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/NTCP2.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/NetDb.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/NetDb.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/NetDbRequests.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/NetDbRequests.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Poly1305.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Poly1305.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Profiling.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Profiling.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Reseed.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Reseed.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/RouterContext.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/RouterContext.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/RouterInfo.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/RouterInfo.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/SSU2.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/SSU2.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/SSU2Session.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/SSU2Session.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Signature.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Signature.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Streaming.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Streaming.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Timestamp.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Timestamp.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/TransitTunnel.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/TransitTunnel.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Transports.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Transports.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/Tunnel.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/Tunnel.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/TunnelConfig.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/TunnelConfig.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/TunnelEndpoint.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/TunnelEndpoint.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/TunnelGateway.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/TunnelGateway.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/TunnelPool.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/TunnelPool.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/api.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/api.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd/util.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd/util.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],

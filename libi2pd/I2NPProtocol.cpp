@@ -22,7 +22,6 @@
 #include "I2NPProtocol.h"
 #include "version.h"
 #include "Logger.h"
-#include "Logger_transport.h"
 
 using namespace i2p::transport;
 
@@ -1009,6 +1008,7 @@ namespace i2p
 		}
 	}
 
+	// 将暂存的消息发送到处理器
 	void I2NPMessagesHandler::Flush ()
 	{
 		if (!m_TunnelMsgs.empty ())

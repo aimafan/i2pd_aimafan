@@ -170,12 +170,17 @@ namespace tunnel
 		// 构建IP和from
 		std::string from_ip;
 		std::string from_port;
+		std::string this_protocal;
 		void SetIPandPort( std::string ip, std::string port) {
 			from_ip = ip;
 			from_port = port;
 		}
+		void SetProtocal( std::string protocal) {
+			this_protocal = protocal;
+		}
 		std::string GetIP() { return from_ip;}
 		std::string GetPort() { return from_port;}
+		std::string GetProtocal() { return this_protocal;}
 		/////////////////////////////
 
 		I2NPMessage (): buf (nullptr), len (I2NP_HEADER_SIZE + 2),

@@ -99,7 +99,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : " -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g"
+					"fragment" : " -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC"
 				}
 			],
 			"defines" : 
@@ -149,19 +149,19 @@
 			[
 				{
 					"backtrace" : 8,
-					"path" : "/root/Documents/i2pd_link_explorer/build/../libi2pd"
+					"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build/../libi2pd"
 				},
 				{
 					"backtrace" : 9,
-					"path" : "/root/Documents/i2pd_link_explorer/build/../libi2pd_client"
+					"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build/../libi2pd_client"
 				},
 				{
 					"backtrace" : 10,
-					"path" : "/root/Documents/i2pd_link_explorer/build/../i18n"
+					"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build/../i18n"
 				},
 				{
 					"backtrace" : 11,
-					"path" : "/root/Documents/i2pd_link_explorer/build/../daemon"
+					"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build/../daemon"
 				}
 			],
 			"language" : "CXX",
@@ -181,15 +181,15 @@
 	[
 		{
 			"backtrace" : 3,
+			"id" : "libi2pdlang::@6890427a1f51a3e7e1df"
+		},
+		{
+			"backtrace" : 3,
 			"id" : "libi2pd::@6890427a1f51a3e7e1df"
 		},
 		{
 			"backtrace" : 3,
 			"id" : "libi2pdclient::@6890427a1f51a3e7e1df"
-		},
-		{
-			"backtrace" : 3,
-			"id" : "libi2pdlang::@6890427a1f51a3e7e1df"
 		}
 	],
 	"id" : "i2pd::@6890427a1f51a3e7e1df",
@@ -212,7 +212,7 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "-Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g",
+				"fragment" : "-Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC",
 				"role" : "flags"
 			},
 			{
@@ -300,43 +300,43 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/daemon/Daemon.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/daemon/Daemon.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/daemon/HTTPServer.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/daemon/HTTPServer.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/daemon/I2PControl.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/daemon/I2PControl.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/daemon/I2PControlHandlers.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/daemon/I2PControlHandlers.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/daemon/i2pd.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/daemon/i2pd.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/daemon/UPnP.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/daemon/UPnP.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/daemon/UnixDaemon.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/daemon/UnixDaemon.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],

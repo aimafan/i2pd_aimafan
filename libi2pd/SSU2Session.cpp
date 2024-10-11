@@ -13,6 +13,9 @@
 #include "Gzip.h"
 #include "NetDb.hpp"
 #include "SSU2.h"
+#include "Logger.h"
+#include "Tunnel.h"
+
 
 namespace i2p
 {
@@ -357,175 +360,267 @@ namespace transport
 
 	void SSU2Session::PostI2NPMessages (std::vector<std::shared_ptr<I2NPMessage> > msgs)
 	{
+		// 如果当前会话的状态为已终止，直接返回，不处理消息
 		if (m_State == eSSU2SessionStateTerminated) return;
-		uint64_t mts = i2p::util::GetMonotonicMicroseconds ();
-		bool isSemiFull = false;
-		if (m_SendQueue.size ())
+
+		// 获取当前的单调时间（微秒）
+		uint64_t mts = i2p::util::GetMonotonicMicroseconds();
+		bool isSemiFull = false; // 是否发送队列处于半满状态
+
+		// 检查发送队列是否有消息
+		if (m_SendQueue.size())
 		{
-			int64_t queueLag = (int64_t)mts - (int64_t)m_SendQueue.front ()->GetEnqueueTime ();
-			isSemiFull = queueLag > m_MsgLocalSemiExpirationTimeout;
+			// 计算队列中最早消息的滞后时间
+			int64_t queueLag = (int64_t)mts - (int64_t)m_SendQueue.front()->GetEnqueueTime();
+			isSemiFull = queueLag > m_MsgLocalSemiExpirationTimeout; // 如果滞后时间超过超时时间，队列为半满状态
+
+			// 如果队列半满，记录日志
 			if (isSemiFull)
 			{
 				LogPrint (eLogWarning, "SSU2: Outgoing messages queue to ",
-					i2p::data::GetIdentHashAbbreviation (GetRemoteIdentity ()->GetIdentHash ()),
-					" is semi-full (size = ", m_SendQueue.size (), ", lag = ", queueLag / 1000, ", rtt = ", (int)m_RTT, ")");
+					i2p::data::GetIdentHashAbbreviation (GetRemoteIdentity()->GetIdentHash()),
+					" is semi-full (size = ", m_SendQueue.size(), ", lag = ", queueLag / 1000, 
+					", rtt = ", (int)m_RTT, ")");
 			}
 		}
+
+		// 将新的I2NP消息添加到发送队列中
 		for (auto it: msgs)
 		{
+			// 如果队列半满且消息有丢弃处理器，则丢弃该消息
 			if (isSemiFull && it->onDrop)
-				it->Drop (); // drop earlier because we can handle it
+				it->Drop(); // 提前丢弃，因为无法处理该消息
 			else
 			{
-				it->SetEnqueueTime (mts);
-				m_SendQueue.push_back (std::move (it));
+				// 设置消息的入队时间并将其加入发送队列
+				it->SetEnqueueTime(mts);
+				m_SendQueue.push_back(std::move(it));
 			}
 		}
-		SendQueue ();
 
-		if (m_SendQueue.size () > 0) // windows is full
-			Resend (i2p::util::GetMillisecondsSinceEpoch ());
-		SetSendQueueSize (m_SendQueue.size ());
+		// 发送队列中的消息
+		SendQueue();
+
+		// 如果发送队列中仍有消息，则表示窗口已满，进行消息重传
+		if (m_SendQueue.size() > 0)
+			Resend(i2p::util::GetMillisecondsSinceEpoch());
+
+		// 更新发送队列的大小
+		SetSendQueueSize(m_SendQueue.size());
 	}
+
 
 	bool SSU2Session::SendQueue ()
 	{
-		if (!m_SendQueue.empty () && m_SentPackets.size () <= m_WindowSize)
+		// 检查发送队列是否为空，以及已发送的包数是否小于或等于窗口大小
+		if (!m_SendQueue.empty() && m_SentPackets.size() <= m_WindowSize)
 		{
-			auto ts = i2p::util::GetMillisecondsSinceEpoch ();
-			uint64_t mts = i2p::util::GetMonotonicMicroseconds ();
-			auto packet = m_Server.GetSentPacketsPool ().AcquireShared ();
-			size_t ackBlockSize = CreateAckBlock (packet->payload, m_MaxPayloadSize);
+			// 获取当前时间戳（毫秒和微秒）
+			auto ts = i2p::util::GetMillisecondsSinceEpoch();
+			uint64_t mts = i2p::util::GetMonotonicMicroseconds();
+
+			// 从发送包池中获取一个包
+			auto packet = m_Server.GetSentPacketsPool().AcquireShared();
+
+			// 创建一个ACK块并将其添加到数据包中
+			size_t ackBlockSize = CreateAckBlock(packet->payload, m_MaxPayloadSize);
 			bool ackBlockSent = false;
 			packet->payloadSize += ackBlockSize;
-			while (!m_SendQueue.empty () && m_SentPackets.size () <= m_WindowSize)
+
+			// 遍历发送队列并将消息打包
+			while (!m_SendQueue.empty() && m_SentPackets.size() <= m_WindowSize)
 			{
-				auto msg = m_SendQueue.front ();
-				if (!msg || msg->IsExpired (ts) || msg->GetEnqueueTime() + m_MsgLocalExpirationTimeout < mts)
+				auto msg = m_SendQueue.front();
+
+				// 如果消息为空、已过期或本地消息过期时间已到，则丢弃消息
+				if (!msg || msg->IsExpired(ts) || msg->GetEnqueueTime() + m_MsgLocalExpirationTimeout < mts)
 				{
-					// drop null or expired message
-					if (msg) msg->Drop ();
-					m_SendQueue.pop_front ();
+					if (msg) msg->Drop();
+					m_SendQueue.pop_front(); // 从发送队列中移除消息
 					continue;
 				}
-				size_t len = msg->GetNTCP2Length () + 3;
-				if (len > m_MaxPayloadSize) // message too long
+				std::string protocal = "SSU2";
+				std::string size = std::to_string(msg->GetLength());
+				std::string msg_type = getMessageType(msg->GetTypeID());
+				std::string host =  m_RemoteEndpoint.address().to_string();
+				std::string port = std::to_string(m_RemoteEndpoint.port());
+				std::string ident = m_RemoteIdentity->GetIdentHash().ToBase64();
+				std::string my_tunnelID = "";
+				if(msg_type == "TunnelData" || msg_type == "TunnelGateway"){
+					my_tunnelID = std::to_string(bufbe32toh (msg->GetPayload ()));
+				}
+
+				// 这里的host和port是我想要发送出去的吗，先看看
+				// 并不是
+				LogToFile("发 ; " + protocal + " ; " + host + " ; " + port + " ; " + ident + " ; " + my_tunnelID + " ; " + msg_type + " ; " + size);
+				
+				// 获取消息的长度
+				size_t len = msg->GetNTCP2Length() + 3; // 消息长度加上额外的3个字节
+				if (len > m_MaxPayloadSize) // 如果消息太长，无法放入单个数据包
 				{
-					m_SendQueue.pop_front ();
-					if (SendFragmentedMessage (msg))
+					m_SendQueue.pop_front();
+					if (SendFragmentedMessage(msg)) // 发送分片消息
 						ackBlockSent = true;
 				}
-				else if (packet->payloadSize + len <= m_MaxPayloadSize)
+				else if (packet->payloadSize + len <= m_MaxPayloadSize) // 如果消息能放入当前数据包
 				{
-					m_SendQueue.pop_front ();
-					packet->payloadSize += CreateI2NPBlock (packet->payload + packet->payloadSize, m_MaxPayloadSize - packet->payloadSize, std::move (msg));
+					m_SendQueue.pop_front(); // 从发送队列中移除消息
+					// 将消息添加到数据包中
+					packet->payloadSize += CreateI2NPBlock(packet->payload + packet->payloadSize, m_MaxPayloadSize - packet->payloadSize, std::move(msg));
 				}
-				else
+				else // 当前数据包已满，创建新包
 				{
-					// create new packet and copy ack block
-					auto newPacket = m_Server.GetSentPacketsPool ().AcquireShared ();
-					memcpy (newPacket->payload, packet->payload, ackBlockSize);
+					auto newPacket = m_Server.GetSentPacketsPool().AcquireShared();
+					memcpy(newPacket->payload, packet->payload, ackBlockSize); // 将ACK块复制到新包中
 					newPacket->payloadSize = ackBlockSize;
-					// complete current packet
-					if (packet->payloadSize > ackBlockSize) // more than just ack block
+
+					// 完成当前数据包的创建
+					if (packet->payloadSize > ackBlockSize) // 数据包不仅仅是ACK块
 					{
 						ackBlockSent = true;
-						// try to add padding
+						// 尝试填充数据包
 						if (packet->payloadSize + 16 < m_MaxPayloadSize)
-							packet->payloadSize += CreatePaddingBlock (packet->payload + packet->payloadSize, m_MaxPayloadSize - packet->payloadSize);
+							packet->payloadSize += CreatePaddingBlock(packet->payload + packet->payloadSize, m_MaxPayloadSize - packet->payloadSize);
 					}
-					else
+					else // 仅包含ACK块
 					{
-						// reduce ack block
-						if (len + 8 < m_MaxPayloadSize)
+						if (len + 8 < m_MaxPayloadSize) // 如果消息能与ACK块共存
 						{
-							// keep Ack block and drop some ranges
 							ackBlockSent = true;
 							packet->payloadSize = m_MaxPayloadSize - len;
-							if (packet->payloadSize & 0x01) packet->payloadSize--; // make it even
-							htobe16buf (packet->payload + 1, packet->payloadSize - 3); // new block size
+							if (packet->payloadSize & 0x01) packet->payloadSize--; // 确保ACK块的大小为偶数
+							htobe16buf(packet->payload + 1, packet->payloadSize - 3); // 更新ACK块大小
 						}
-						else // drop Ack block completely
+						else // 完全丢弃ACK块
+						{
 							packet->payloadSize = 0;
-						// msg fits single packet
-						m_SendQueue.pop_front ();
-						packet->payloadSize += CreateI2NPBlock (packet->payload + packet->payloadSize, m_MaxPayloadSize - packet->payloadSize, std::move (msg));
+						}
+
+						// 消息可以完全放入新包中
+						m_SendQueue.pop_front();
+						packet->payloadSize += CreateI2NPBlock(packet->payload + packet->payloadSize, m_MaxPayloadSize - packet->payloadSize, std::move(msg));
 					}
-					// send right a way
-					uint32_t packetNum = SendData (packet->payload, packet->payloadSize);
+
+					// 立即发送当前数据包
+					uint32_t packetNum = SendData(packet->payload, packet->payloadSize);
 					packet->sendTime = ts;
-					m_SentPackets.emplace (packetNum, packet);
-					packet = newPacket; // just ack block
+					m_SentPackets.emplace(packetNum, packet); // 记录已发送的包
+					packet = newPacket; // 准备新的数据包
 				}
-			};
+			}
+
+			// 如果当前数据包包含数据（不仅是ACK块）
 			if (packet->payloadSize > ackBlockSize)
 			{
-				// last
 				ackBlockSent = true;
 				if (packet->payloadSize + 16 < m_MaxPayloadSize)
-					packet->payloadSize += CreatePaddingBlock (packet->payload + packet->payloadSize, m_MaxPayloadSize - packet->payloadSize);
-				uint32_t packetNum = SendData (packet->payload, packet->payloadSize, SSU2_FLAG_IMMEDIATE_ACK_REQUESTED);
+					packet->payloadSize += CreatePaddingBlock(packet->payload + packet->payloadSize, m_MaxPayloadSize - packet->payloadSize);
+				
+				// 发送最后的数据包并请求立即确认
+				uint32_t packetNum = SendData(packet->payload, packet->payloadSize, SSU2_FLAG_IMMEDIATE_ACK_REQUESTED);
 				packet->sendTime = ts;
-				m_SentPackets.emplace (packetNum, packet);
+				m_SentPackets.emplace(packetNum, packet); // 记录已发送的包
 			}
-			return ackBlockSent;
+
+			return ackBlockSent; // 返回是否发送了ACK块
 		}
-		return false;
+		return false; // 如果没有发送数据包，返回false
 	}
+
 
 	bool SSU2Session::SendFragmentedMessage (std::shared_ptr<I2NPMessage> msg)
 	{
+		// 如果消息为空，直接返回false
 		if (!msg) return false;
-		size_t lastFragmentSize = (msg->GetNTCP2Length () + 3 - m_MaxPayloadSize) % (m_MaxPayloadSize - 8);
+
+		// 计算最后一个分片的大小以及多余的大小（如果有的话）
+		size_t lastFragmentSize = (msg->GetNTCP2Length() + 3 - m_MaxPayloadSize) % (m_MaxPayloadSize - 8);
 		size_t extraSize = m_MaxPayloadSize - lastFragmentSize;
-		bool ackBlockSent = false;
-		uint32_t msgID;
-		memcpy (&msgID, msg->GetHeader () + I2NP_HEADER_MSGID_OFFSET, 4);
-		auto ts = i2p::util::GetMillisecondsSinceEpoch ();
-		auto packet = m_Server.GetSentPacketsPool ().AcquireShared ();
+		bool ackBlockSent = false; // 标识是否发送了ACK块
+		uint32_t msgID; // 消息ID
+
+		// 获取消息的ID（从消息头中复制4个字节）
+		memcpy(&msgID, msg->GetHeader() + I2NP_HEADER_MSGID_OFFSET, 4);
+
+		// 获取当前的时间戳（毫秒）
+		auto ts = i2p::util::GetMillisecondsSinceEpoch();
+
+		// 从发送包池中获取一个包
+		auto packet = m_Server.GetSentPacketsPool().AcquireShared();
+
+		// 如果多余的大小大于等于8，则创建并发送一个包含ACK块的包
 		if (extraSize >= 8)
 		{
-			packet->payloadSize = CreateAckBlock (packet->payload, extraSize);
-			ackBlockSent = true;
+			packet->payloadSize = CreateAckBlock(packet->payload, extraSize); // 创建ACK块
+			ackBlockSent = true; // 标记ACK块已发送
+
+			// 如果数据包的大小加上12字节还小于最大有效载荷，则发送数据包
 			if (packet->payloadSize + 12 < m_MaxPayloadSize)
 			{
-				uint32_t packetNum = SendData (packet->payload, packet->payloadSize);
-				packet->sendTime = ts;
-				m_SentPackets.emplace (packetNum, packet);
-				packet = m_Server.GetSentPacketsPool ().AcquireShared ();
+				uint32_t packetNum = SendData(packet->payload, packet->payloadSize); // 发送数据包
+				packet->sendTime = ts; // 记录发送时间
+				m_SentPackets.emplace(packetNum, packet); // 保存已发送的数据包
+				packet = m_Server.GetSentPacketsPool().AcquireShared(); // 获取一个新的数据包
 			}
 			else
+			{
+				// 否则，减少多余的大小
 				extraSize -= packet->payloadSize;
+			}
 		}
-		size_t offset = extraSize > 0 ? (rand () % extraSize) : 0;
-		if (offset + packet->payloadSize >= m_MaxPayloadSize) offset = 0;
-		auto size = CreateFirstFragmentBlock (packet->payload + packet->payloadSize, m_MaxPayloadSize - offset - packet->payloadSize, msg);
-		if (!size) return false;
-		extraSize -= offset;
-		packet->payloadSize += size;
-		uint32_t firstPacketNum = SendData (packet->payload, packet->payloadSize);
-		packet->sendTime = ts;
-		m_SentPackets.emplace (firstPacketNum, packet);
-		uint8_t fragmentNum = 0;
+
+		// 根据额外大小，生成一个偏移量（用于数据包分片）
+		size_t offset = extraSize > 0 ? (rand() % extraSize) : 0;
+		if (offset + packet->payloadSize >= m_MaxPayloadSize) offset = 0; // 确保偏移量有效
+
+		// 创建第一个分片数据块并添加到数据包中
+		auto size = CreateFirstFragmentBlock(packet->payload + packet->payloadSize, m_MaxPayloadSize - offset - packet->payloadSize, msg);
+		if (!size) return false; // 如果创建失败，返回false
+
+		extraSize -= offset; // 减少额外大小
+		packet->payloadSize += size; // 增加数据包的有效负载大小
+
+		// 发送第一个分片数据包
+		uint32_t firstPacketNum = SendData(packet->payload, packet->payloadSize);
+		packet->sendTime = ts; // 记录发送时间
+		m_SentPackets.emplace(firstPacketNum, packet); // 保存已发送的数据包
+
+		uint8_t fragmentNum = 0; // 当前分片号
+
+		// 循环发送后续分片，直到消息的偏移量达到消息长度
 		while (msg->offset < msg->len)
 		{
-			offset = extraSize > 0 ? (rand () % extraSize) : 0;
-			packet = m_Server.GetSentPacketsPool ().AcquireShared ();
-			packet->payloadSize = CreateFollowOnFragmentBlock (packet->payload, m_MaxPayloadSize - offset, msg, fragmentNum, msgID);
-			extraSize -= offset;
-			uint8_t flags = 0;
-			if (msg->offset >= msg->len && packet->payloadSize + 16 < m_MaxPayloadSize) // last fragment
+			// 随机生成偏移量
+			offset = extraSize > 0 ? (rand() % extraSize) : 0;
+			packet = m_Server.GetSentPacketsPool().AcquireShared(); // 获取一个新的数据包
+
+			// 创建后续分片数据块并添加到数据包中
+			packet->payloadSize = CreateFollowOnFragmentBlock(packet->payload, m_MaxPayloadSize - offset, msg, fragmentNum, msgID);
+			extraSize -= offset; // 减少多余大小
+
+			uint8_t flags = 0; // 用于标记特殊情况
+			// 如果这是最后一个分片，并且数据包大小足够小，可以填充数据包
+			if (msg->offset >= msg->len && packet->payloadSize + 16 < m_MaxPayloadSize)
 			{
-				packet->payloadSize += CreatePaddingBlock (packet->payload + packet->payloadSize, m_MaxPayloadSize - packet->payloadSize);
-				if (fragmentNum > 2) // 3 or more fragments
+				// 添加填充块
+				packet->payloadSize += CreatePaddingBlock(packet->payload + packet->payloadSize, m_MaxPayloadSize - packet->payloadSize);
+
+				// 如果分片数量大于2，则请求立即确认
+				if (fragmentNum > 2)
 					flags |= SSU2_FLAG_IMMEDIATE_ACK_REQUESTED;
 			}
-			uint32_t followonPacketNum = SendData (packet->payload, packet->payloadSize, flags);
-			packet->sendTime = ts;
-			m_SentPackets.emplace (followonPacketNum, packet);
+
+			// 发送后续分片数据包
+			uint32_t followonPacketNum = SendData(packet->payload, packet->payloadSize, flags);
+			packet->sendTime = ts; // 记录发送时间
+			m_SentPackets.emplace(followonPacketNum, packet); // 保存已发送的数据包
+
+			fragmentNum++; // 增加分片号
 		}
-		return ackBlockSent;
+
+		return ackBlockSent; // 返回是否发送了ACK块
 	}
+
 
 	size_t SSU2Session::Resend (uint64_t ts)
 	{
@@ -2395,9 +2490,15 @@ namespace transport
 		if (!msg->IsExpired ())
 		{
 			msg->SetIPandPort(host, port);
+			msg->SetProtocal("SSU2");
 			// m_LastActivityTimestamp is updated in ProcessData before
-			if (m_ReceivedI2NPMsgIDs.emplace (msgID, (uint32_t)GetLastActivityTimestamp ()).second)
+			if (m_ReceivedI2NPMsgIDs.emplace (msgID, (uint32_t)GetLastActivityTimestamp ()).second){
+				std::string size = std::to_string(msg->GetLength());
+				std::string host = msg->GetIP();
+				std::string port = msg->GetPort();
+				std::string msg_type = std::to_string(msg->GetTypeID());
 				m_Handler.PutNextMessage (std::move (msg));
+			}
 			else
 				LogPrint (eLogDebug, "SSU2: Message ", msgID, " already received");
 		}

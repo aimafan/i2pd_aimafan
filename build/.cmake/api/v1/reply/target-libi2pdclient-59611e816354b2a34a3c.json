@@ -93,7 +93,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : " -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC -g"
+					"fragment" : " -Wall -Wextra -Winvalid-pch -Wno-unused-parameter -Wno-uninitialized -std=c++17 -pipe -maes -fPIC"
 				}
 			],
 			"defines" : 
@@ -139,19 +139,19 @@
 			[
 				{
 					"backtrace" : 7,
-					"path" : "/root/Documents/i2pd_link_explorer/build/../libi2pd"
+					"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build/../libi2pd"
 				},
 				{
 					"backtrace" : 8,
-					"path" : "/root/Documents/i2pd_link_explorer/build/../libi2pd_client"
+					"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build/../libi2pd_client"
 				},
 				{
 					"backtrace" : 9,
-					"path" : "/root/Documents/i2pd_link_explorer/build/../i18n"
+					"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build/../i18n"
 				},
 				{
 					"backtrace" : 10,
-					"path" : "/root/Documents/i2pd_link_explorer/build/../daemon"
+					"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/build/../daemon"
 				}
 			],
 			"language" : "CXX",
@@ -218,67 +218,67 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd_client/AddressBook.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd_client/AddressBook.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd_client/BOB.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd_client/BOB.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd_client/ClientContext.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd_client/ClientContext.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd_client/HTTPProxy.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd_client/HTTPProxy.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd_client/I2CP.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd_client/I2CP.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd_client/I2PService.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd_client/I2PService.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd_client/I2PTunnel.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd_client/I2PTunnel.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd_client/MatchedDestination.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd_client/MatchedDestination.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd_client/SAM.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd_client/SAM.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd_client/SOCKS.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd_client/SOCKS.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "/root/Documents/i2pd_link_explorer/libi2pd_client/UDPTunnel.cpp",
+			"path" : "/root/Documents/i2pd_wartermark_attack/i2pd_middle/libi2pd_client/UDPTunnel.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],
