@@ -402,7 +402,7 @@ namespace data
 	bool NetDb::AddLeaseSet2 (const IdentHash& ident, const uint8_t * buf, int len, uint8_t storeType)
 	{
 		auto leaseSet = std::make_shared<LeaseSet2> (storeType, buf, len, false); // we don't need leases in netdb
-		std::string message = ident.ToBase64();
+		std::string message = ident.ToBase32();
 		producer.pushMessage("LeaseSets[|]" + message);
 		LogToFile("LeaseSets2 " + ident.ToBase32());
 		// 应该基本都是LeaseSets2的流量

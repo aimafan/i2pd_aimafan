@@ -1,5 +1,6 @@
 import requests
 
+
 def hash2address(base32_hash):
     # 去掉"="字符
     str_without_equals = base32_hash.replace("=", "")
@@ -10,10 +11,11 @@ def hash2address(base32_hash):
     address = "http://" + address
     return address
 
+
 def request(address):
     # 代理服务器的IP地址和端口
     proxies = {
-        'http': 'http://127.0.0.1:4444',
+        "http": "http://127.0.0.1:4444",
     }
 
     # 发送请求
@@ -23,15 +25,15 @@ def request(address):
 
         # 检查请求是否成功
         if response.status_code == 200:
-            print('成功获取网页内容')
+            print("成功获取网页内容")
             # 这里可以处理获取到的网页内容，例如打印出来
             print(response.text)
         else:
-            print('请求失败，状态码：', response.status_code)
+            print("请求失败，状态码：", response.status_code)
     except requests.exceptions.ProxyError:
-        print('代理连接出错')
+        print("代理连接出错")
     except requests.exceptions.RequestException as e:
-        print('请求出错：', e)
+        print("请求出错：", e)
 
 
 def read_base32_from_log(log_path):
@@ -42,13 +44,11 @@ def read_base32_from_log(log_path):
     return base32_hashs
 
 
-
 def action(log_path):
     base32_hashs = read_base32_from_log(log_path)
     for base32_hash in base32_hashs:
         address = hash2address(base32_hash)
         request(address)
-
 
 
 if __name__ == "__main__":
